@@ -5947,12 +5947,6 @@ cursor.close()
 
 本篇使用 charGPT 来举例
 
-我的 chatGPT 的 `APIkey` 
-
-```py
-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
-```
-
 
 
 ## 1 配置环境
