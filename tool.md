@@ -1,0 +1,1639 @@
+# Bash
+
+## 1 Shell 基础
+
+
+Shell 是文本形式的计算机交互接口，允许通过命令执行程序、管理文件及系统资源
+
+常见的 Shell 有 `Bash`（默认）、`Zsh` 、`Fish` 等  
+
+终端（Terminal）是运行 Shell 的应用程序
+
+当打开终端时，会看到一个提示符
+
+```bash
+missing:~$ 
+```
+
+  - `missing`：主机名  
+  - `~`：当前工作目录（`~` 表示用户主目录）  
+  - `$`：普通用户身份（`#` 表示 root 用户）
+
+
+
+
+
+## 2 Shell 指令
+
+### 2.1 基础指令
+
+#### 2.1.1 打印内容
+
+1. `echo` 输出字符串
+
+```bash
+echo Hello
+# Hello
+```
+
+shell 基于空格分割命令并进行解析，然后执行第一个单词代表的程序，并将后续的单词作为程序可以访问的参数
+
+如果希望传递的参数中包含空格，可以使用单引号或双引号将其包裹起来，要么使用转义符号 `\` 进行处理
+
+```bash
+echo "Hello world"
+echo 'Hello world'
+echo Hello\ world
+# Hello world
+
+echo Hello world
+# echo Hello world
+# echo 会依照空格将内容拆分并打印出每个单词, 因此输出结果依然是 Hello world
+```
+
+
+
+2. `date` 打印时间
+
+```bash
+date
+# Fri 10 Jan 2020 11:49:31 AM EST 打印当前时间
+```
+
+
+
+3. `pwd` 打印地址
+
+```bash
+pwd
+# /home 打印当前目录地址
+```
+
+
+
+
+
+
+
+#### 2.1.2 目录操作
+
+shell 中的路径是一组被分割的目录，在 Linux 和 macOS 上使用 `/` 分割，而在 Windows 上是 `\`
+
+路径 `/` 代表的是系统的根目录，所有的文件夹都包括在这个路径之下，在 Windows 上每个盘都有一个根目录（例如： `C:\`）
+
+如果某个路径以 `/` 开头，那么它是一个**绝对路径**，其他的都是**相对路径** 
+
+相对路径是指相对于当前工作目录的路径
+
+
+
+1. `cd` 切换目录
+
+```bash
+cd ..
+# 返回上级目录, 在路径中, . 表示的是当前目录，而 .. 表示上级目录
+
+cd
+# 返回当前用户目录
+# /home/user
+
+cd test
+# 进入指定目录
+# /home/user/test
+```
+
+
+
+2. `ls` 查看目录
+
+```bash
+ls
+# 显示当前目录下的子目录和文件
+
+ls ./test
+# 显示 test 目录下的所有子目录和文件
+
+ls --help
+# 使用 -h 或 --help 标记可以打印帮助信息, 可查看用标记或选项
+```
+
+大多数的命令接受标记和选项（带有值的标记），它们以 `-` 开头，并可以改变程序的行为
+
+
+
+3. `mkdir` 创建目录
+
+```bash
+mkdir demo
+# 在当前目录下创建 demo 目录
+
+mkdir -p demo/dir1/dir2
+# 递归创建多级目录, 如果上级目录不存在, 则会自动创建
+# 当目录已经存在时避免报错
+
+mkdir dir1 dir2 dir3
+# 创建多个目录
+
+mkdir demo && cd demo
+# 创建目录后进入
+```
+
+
+
+
+
+
+
+#### 2.1.3 文件操作
+
+1. `touch` 创建文件
+
+```bash
+touch main.cpp
+# 创建文件
+
+touch file1.txt file2.txt
+# 创建多个文件
+```
+
+
+
+2. `rm` 删除文件
+
+```bash
+rm file.txt
+# 删除文件 file.txt
+
+rm file1.txt file2.txt file3.txt
+# 删除多个文件
+
+rm -f file.txt
+# 强制删除文件
+
+rm -r dirname
+# 删除目录及其内容
+```
+
+
+
+
+
+3. `cp` 复制文件/目录
+
+```bash
+cp old.txt new.txt
+# 将 old.txt 复制为 new.txt, 如果 new.txt 存在则会被覆盖
+
+cp -p old.txt new.txt
+# 复制时保留文件的 权限、所有者、时间戳 等信息
+
+cp old.txt /path/dir/
+# 复制到指定目录下, 文件名保持不变
+
+cp file1 file2 /path/dir/
+# 复制多个文件
+
+cp -r dir1 dir2
+# 复制整个目录 dir1 及其内容到 dir2, dir2 若不存在则会自动创建
+```
+
+
+
+4. `mv` 移动文件
+
+```bash
+mv old.txt new.txt
+# 将 old.txt 重命名为 new.txt
+
+mv file.txt /path/dir/
+# 将文件移动到指定目录下
+
+mv dir /path/dir/
+# 将 dir 及其内容移动到 dir/ 目录下
+
+mv -f file1 file2
+# 用 file1 强制覆盖 file2, 不会提示确认
+```
+
+
+
+
+
+
+
+#### 2.1.4 查看文件 cat
+
+`cat` 主要用于查看文件内容、合并多个文件，甚至创建文件
+
+1. 查看文件内容
+
+```bash
+cat file.txt
+# 显示 file.txt 的全部内容
+```
+
+
+
+2.  显示行号
+
+```bash
+cat -n file.txt
+# 显示文件内容时，在每行前添加行号
+```
+
+
+
+3. 合并多个文件
+
+```bash
+cat file1 file2 > merged.txt
+# 将 file1 和 file2 的内容合并, 并保存到 merged.txt
+```
+
+
+
+4. 追加内容
+
+```bash
+cat file1 >> file2
+# 将 file1 的内容追加到 file2 末尾
+```
+
+
+
+5. 创建文件并输入内容
+
+```bash
+cat > newfile.txt
+# 然后输入内容, 按 Ctrl + D 结束
+```
+
+
+
+
+
+
+
+#### 2.1.5 字符操作 tr
+
+`tr` 命令用于替换、删除或压缩文本流中的字符，通常与 `echo`、`cat`、`grep`、`awk`、`sed` 等命令组合使用
+
+基础语法：`tr [选项] 'SET1' 'SET2'`
+
+`'SET1'` 和 `'SET2'` 可以为单一字符，也可以为字符串或正则表达式
+
+当 `SET` 为字符串时，会进行逐字符映射
+
+例：
+
+```bash
+echo "hello" | tr 'hello' 'hi'
+# hiiii
+# h -> h, e -> i   l l o 没有对应字符, 取 i
+```
+
+
+
+1. 字符替换
+
+```bash
+cat file.txt | tr ' ' '\n'
+# 将文本中的字符转换位换行符
+
+echo "HELLO WORLD" | tr 'A-Z' 'a-z'
+echo "hello world" | tr 'a-z' 'A-Z'
+# 大小写转换
+```
+
+
+
+2. 删除字符
+
+```bash
+echo "My number is czy2333" | tr -d '0-9'
+# My number is czy
+# 删除所有数字
+```
+
+
+
+3. 字符去重
+
+```bash
+echo "Hello      World" | tr -s ' '
+# Hello World
+# 去除多余空格
+```
+
+
+
+
+
+#### 2.1.6 grep 和 awk
+
+`grep` 主要用于 **搜索文本**，根据正则表达式匹配行并输出
+
+`awk` 是一个 **文本处理工具**，可对匹配行进行进一步操作，如字段提取、计算、格式化输出等
+
+
+
+1. `grep`
+
+```bash
+grep "hello" file.txt
+# 从 file.txt 中查找包含 "hello" 的行
+
+grep -i "hello" file.txt
+# 忽略匹配字符串的大小写
+
+grep -n "hello" file.txt
+# 在匹配的行前面加上行号
+
+grep -l "hello" *.txt
+# 显示当前目录下包含 "hello" 的文件名, 不显示内容
+
+grep -x "hello" file.txt
+#  当整行为 "hello" 时才相匹配
+
+grep -v "hello" file.txt
+# 反向匹配, 显示不包含 "hello" 的行
+
+grep -E "hello|world" file.txt
+# 使用正则匹配, 匹配 "hello" 或 "world"
+```
+
+
+
+2. `awk`
+
+```bash
+awk '{print $1}' file.txt
+# 输出 file.txt 每行的第一个字段（默认以空格或制表符分隔）
+
+awk '{print $1 $3}' file.txt
+# 以空格作为分隔符, 输出第一列和第三列
+
+awk '{print $1 "," $3}' file.txt
+# 以逗号 , 作为分隔符, 输出第一列和第三列
+
+awk '/hello/ {print $0}' file.txt
+# 输出包含 "hello" 的行
+
+awk '$3 > 50 {print $1, $3}' file.txt
+# 条件判断, 如果第三列值大于 50, 则输出第一列和第三列
+
+awk '{sum += $2} END {print "Total:", sum}' file.txt
+# 计算列的总和, 计算第二列的总和
+
+awk '{printf "Name: %s, Score: %d\n", $1, $2}' file.txt
+# 格式化输出, 使用 printf 格式化输出，第一列是 Name，第二列是 Score
+```
+
+
+
+
+
+
+
+### 2.2 相关概念
+
+#### 2.2.1 环境变量
+
+当 shell 执行某个指令，但是该指令并不是 shell 所了解的编程关键字，那么它会去咨询==环境变量== `$PATH`
+
+它会列出当 shell 接到某条指令时，进行程序搜索的路径：
+
+```sh
+echo $PATH
+# /opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:...
+
+which echo
+# /usr/bin/echo
+
+/bin/echo $PATH
+# 等价于 echo $PATH , /usr 是默认路径的一部分, 可以省略
+```
+
+当我们执行 `echo` 命令时，shell 了解到需要执行 `echo` 这个程序，随后它便会在 `$PATH` 中搜索由 `:` 所分割的一系列目录，基于名字搜索该程序
+
+当找到该程序时便执行（假定该文件是 *可执行程序*，后续课程将详细讲解）
+
+确定某个程序名代表的是哪个具体的程序，可以使用 `which` 程序
+
+我们也可以绕过 `$PATH`，通过直接指定需要执行的程序的路径来执行该程序
+
+
+
+`$ ` 是一个特殊的符号，是用来访问或获取环境变量或 shell 变量值的符号
+
+在 shell 中，变量的定义和引用是通过 `$` 来实现的
+
+
+
+其他作用：
+
+* `$?`：显示上一个命令的退出状态
+
+* `$1`，`$2`，...，`$9`：用于引用脚本或函数中的参数
+
+* `$0`：脚本名
+
+* `$$`：显示当前进程的PID（进程ID）
+
+* `$@`：所有参数
+
+* `$#`：参数个数
+
+* `!!`：完整的上一条命令，包括参数
+
+    （当你因为权限不足执行命令失败时，可以使用 `sudo !!` 再尝试一次）
+
+
+
+**例：**
+
+```bash
+# $?
+ls /error_list
+echo $?
+# 2 , 返回 0 表示命令成功执行, 返回非 0 值表示命令执行失败
+
+echo $USER
+# czy2333 获取当前用户
+echo $HOME
+# /home/czy2333 获取当前用户的主目录
+echo $RANDOM
+# 15159 生成随机数
+```
+
+
+
+
+
+
+
+#### 2.2.2 文件权限
+
+Linux 文件权限决定了 **谁** 可以对 **文件或目录** 执行 **哪些操作**
+
+每个文件或目录都有 **3 种用户类别** 和 **3 种权限**
+
+用户类别：
+
+| 用户类别 | 符号 | 说明                         |
+| -------- | ---- | ---------------------------- |
+| 所有者   | `u`  | 创建文件的用户               |
+| 所属组   | `g`  | 与所有者属于同一用户组的用户 |
+| 其他人   | `o`  | 系统中的其他所有用户         |
+
+权限：
+
+| 权限 | 符号 | 作用                                  |
+| ---- | ---- | ------------------------------------- |
+| 读   | `r`  | 读取文件内容 / 列出目录内容           |
+| 写   | `w`  | 修改文件内容 / 创建、删除目录内的文件 |
+| 执行 | `x`  | 运行可执行文件 / 进入目录             |
+
+
+
+1. 查看文件
+
+```bash
+ls -l file.txt
+# -rw-r--r--  1 user user  1234 Feb 27 12:00 file.txt
+# 第一个参数是该文件的权限
+
+ls -l dir
+# total 目录下文件数量
+# 不能直接查看目录权限
+```
+
+参数拆解：
+
+- `d`：第一位代表文件类型，`-` 是普通文件，`d` 是目录
+- `rwx`：`2-4` 位为所有者权限，`5-7` 所属组权限，`8-10` 位为其他用户权限，没有权限用 `-` 表示
+
+
+
+2. 修改权限
+
+```bash
+# 符号模式修改权限
+chmod u+x file.txt	# 给所有者添加执行权限
+chmod g-w file.txt  # 去掉所属组的写权限
+chmod o+r file.txt  # 给予其他人读权限
+chmod a-x file.txt  # 取消所有用户的执行权限
+# + 为添加权限, - 为移除权限, a 为所有用户
+
+# 数字模式修改权限
+chmod 644 file.txt  # 所有者可读写，其他人只能读
+chmod 700 script.sh # 仅所有者可读写执行，其他人无权限
+chmod 777 file.txt  # 所有人都可读写执行（不安全）
+# 用 3 个 八进制数字 表示
+# r = 4, w = 2, x = 1
+```
+
+
+
+
+
+
+
+#### 2.2.3 重定向与管道
+
+在 shell 中，程序有两个主要的==“流”==：它们的输入流和输出流
+
+当程序尝试读取信息时，它们会从输入流中进行读取，当程序打印信息时，它们会将信息输出到输出流中
+
+一般情况，一个程序的输入输出流都是终端，键盘作为输入，显示器作为输出
+
+
+
+**重定向**
+
+可以通过 `< file` 和 `> file` 将输入输出流重新定向到指定文件：
+
+```sh
+echo hello > hello.txt
+# 将 hello.txt 作为 echo 命令的输出, hello.txt 的内容会被覆盖
+
+echo hello >> hello.txt
+# 令 hello.txt 以追加的形式作为输出
+
+cat < hello.txt
+# 将 hello.txt 文件的内容作为输入传递给 cat 命令
+
+cat < file1.txt > file2.txt
+# 将 file1.txt 文件的内容读取, 将其写入到 file2.txt 中
+```
+
+
+
+**管道**
+
+使用管道（ pipes ），我们能够更好的利用文件重定向
+
+ `|` 操作符允许我们将一个程序的输出和另外一个程序的输入连接起来
+
+```sh
+# 列出当前目录下所有 .txt 后缀的文件, 并显示它们的详细信息
+ls -l | grep ".txt"
+
+# 通过 curl 请求获取 http://example.com 网站的内容, 并将该内容的前 5 行输出
+curl -s http://example.com | head -n 5
+```
+
+
+
+
+
+
+
+#### 2.2.4 sudo
+
+根用户（root user），几乎不受任何限制，他可以创建、读取、更新和删除系统中的任何文件
+
+通常在我们并不会以根用户的身份直接登录系统，因为这样可能会因为某些错误的操作而破坏系统
+
+取而代之的是我们会在需要的时候使用 `sudo` 命令，作用是以  `su`（super user 或 root 的简写）的身份执行一些操作
+
+当遇到拒绝访问（permission denied）的错误时，通常是因为此时必须是根用户才能操作
+
+
+
+`sudo` 可以进行的操作：
+
+```bash
+# 安装、更新和删除软件
+sudo apt install vim  # 安装 Vim 编辑器
+sudo apt update       # 更新软件包列表
+sudo apt remove vim   # 卸载 Vim
+
+# 启动、停止或重启系统服务
+sudo systemctl restart nginx  # 重启 Nginx 服务
+sudo systemctl stop apache2   # 停止 Apache 服务
+sudo systemctl start ssh      # 启动 SSH 服务
+
+# 管理用户和权限
+sudo useradd newuser       # 添加新用户
+sudo passwd newuser        # 设置新用户密码
+sudo userdel newuser       # 删除用户
+
+# 修改文件权限
+sudo chmod 755 /var/www/html  # 修改目录权限
+sudo chown user:user file.txt # 修改文件所属用户
+
+# 关机或重启系统
+sudo shutdown -h now  # 立即关机
+sudo reboot           # 立即重启
+```
+
+
+
+
+
+
+
+
+
+## 3 Shell 脚本
+
+Shell 脚本是一种基于 Shell 解释执行的脚本程序，它由一系列 Shell 命令组成，通常用于自动化任务
+
+需要使用Shell 解释器（如 `bash`、`sh`、`zsh`）执行，无需编译，适用于 Linux 和 Unix 系统
+
+Shell 脚本的文件通常以 `.sh` 结尾，并且需要赋予可执行权限（`chmod +x script.sh`）后才能运行
+
+本节中，我们会专注于 bash 脚本，因为它最流行，应用更为广泛
+
+
+
+### 3.1 赋值
+
+在 bash 中为变量赋值的语法是 `foo=bar`
+
+创建了一个名为 `foo` 的变量，并将 `bar` 赋值给 `foo` 变量
+
+访问变量中存储的数值，其语法为 `$foo`
+
+
+
+需要注意的是，`foo = bar` （使用空格隔开）是不能正确工作的，因为解释器会调用程序 `foo` 并将 `=` 和 `bar` 作为参数
+
+在 shell 脚本中使用空格会起到分割参数的作用，有时候可能会造成混淆，请务必多加检查。
+
+Bash 中的字符串通过 `'` 和 `"` 分隔符来定义，但是它们的含义并不相同
+
+以 `'` 定义的字符串为原义字符串，其中的变量不会被转义，而 `"` 定义的字符串会将变量值进行替换
+
+
+
+**例：**
+
+```sh
+foo=bar
+echo "$foo"
+# 打印 bar
+echo '$foo'
+# 打印 $foo
+```
+
+
+
+
+
+
+
+### 3.2 条件与循环
+
+和其他大多数的编程语言一样，`bash` 也支持 `if`，`case`，`while` 和 `for` 这些控制流关键字
+
+
+
+#### 3.2.1 if
+
+```bash
+if [ condition ]; then
+    # 如果 condition 为 true 执行的命令
+elif [ another_condition ]; then
+    # 如果 another_condition 为 true 执行的命令
+else
+    # 如果以上条件都不成立时执行的命令
+fi
+
+# 例
+x=5
+if [ $x -gt 10 ]; then
+    echo "x is greater than 10"
+elif [ $x -eq 5 ]; then
+    echo "x is equal to 5"
+else
+    echo "x is less than 5"
+fi
+```
+
+注意：
+
+* `-gt` 表示大于，`-ge` 表示大于等于
+
+* `-lt` 表示小于，`-le` 表示小于等于
+
+* `-eq` 表示等于，`-ne` 表示不等于
+
+
+
+#### 3.2.2 case
+
+```bash
+case $variable in
+    pattern1)
+        # 如果变量匹配 pattern1 执行的命令
+        ;;
+    pattern2)
+        # 如果变量匹配 pattern2 执行的命令
+        ;;
+    *)
+        # 默认情况下执行的命令
+        ;;
+esac
+
+# 例
+fruit="apple"
+case $fruit in
+    "apple")
+        echo "This is an apple."
+        ;;
+    "banana")
+        echo "This is a banana."
+        ;;
+    *)
+        echo "Unknown fruit"
+        ;;
+esac
+```
+
+
+
+#### 3.2.3 for
+
+```bash
+# for
+for variable in value1 value2 value3; do
+    # 执行的命令
+done
+
+# 例
+for i in {1..5}; do
+    echo "Number $i"
+done
+```
+
+注意：`{1..5}` 表示从 `1` 到 `5` 的数字范围
+
+
+
+#### 3.2.4 while
+
+```bash
+while [ condition ]; do
+    # 执行的命令
+done
+
+# 例
+while [ $x -le 5 ]; do
+    echo "Number $x"
+    ((x++))  # 增加 x 的值
+done
+```
+
+
+
+
+
+### 3.3 函数
+
+`bash` 支持函数，它可以接受参数并基于参数进行操作
+
+下面这个函数是一个例子，它会创建一个文件夹并使用 `cd` 进入该文件夹
+
+```sh
+mcd () {
+    mkdir -p "$1"
+    cd "$1"
+}
+```
+
+
+
+
+
+
+
+
+
+### 3.4 返回码
+
+返回码或退出状态是脚本和命令之间交流执行状态的方式
+
+返回值 0 表示正常执行，其他所有非 0 的返回值都表示有错误发生
+
+退出码可以搭配 `&&`（与操作符）和 `||`（或操作符）使用，用来进行条件判断，决定是否执行其他程序
+
+它们都属于短路运算符，同一行的多个命令可以用 `;` 分隔
+
+程序 `true` 的返回码永远是 `0`，`false` 的返回码永远是 `1`
+
+让我们看几个例子
+
+```sh
+false || echo "Oops, fail"
+# Oops, fail
+
+true || echo "Will not be printed"
+#
+
+true && echo "Things went well"
+# Things went well
+
+false && echo "Will not be printed"
+#
+
+false ; echo "This will always run"
+# This will always run
+```
+
+
+
+
+
+
+
+### 3.5 替换
+
+**命令替换**
+
+当通过 `$( CMD )` 这样的方式来执行 `CMD` 这个命令时，它的输出结果会替换掉 `$( CMD )`
+
+例如，如果执行 `for file in $(ls)` ，shell 首先将调用 `ls` ，然后遍历得到的这些返回值
+
+
+
+**进程替换**
+
+Shell 允许在命令中将命令的输出作为文件提供给另一个命令
+
+`<( CMD )` 会执行 `CMD` 并将结果输出到一个临时文件中，并将 `<( CMD )` 替换成临时文件名（而不是文件系统中的实际文件）
+
+后续的命令可以像操作普通文件一样处理这些输出
+
+例如， `diff <(ls foo) <(ls bar)` 会显示文件夹 `foo` 和 `bar` 中文件的区别，`diff` 必须接受两个文件做参数
+
+
+
+这段脚本会遍历我们提供的参数，使用 `grep` 搜索字符串 `foobar`，如果没有找到，则将其作为注释追加到文件中
+
+```sh
+#!/bin/bash
+# 命令替换
+echo "Starting program at $(date)" # date会被替换成日期和时间
+echo "Running program $0 with $# arguments with pid $$"
+
+# 进程替换
+touch foo/x bar/y
+# 比较文件夹 foo 和 bar 中包含文件的不同
+diff <(ls foo) <(ls bar)
+# 输出
+# < x
+# ---
+# > y
+```
+
+
+
+
+
+### 3.6 通配符
+
+当执行脚本时，我们经常需要提供形式类似的参数
+
+bash 使我们可以轻松的实现这一操作，它可以基于文件扩展名展开表达式
+
+这一技术被称为 shell 的**通配**（*globbing*）
+
+- 通配符 - 当你想要利用通配符进行匹配时，你可以分别使用 `?` 和 `*` 来匹配一个或任意个字符
+
+    例如，对于文件 `foo`，`foo1`，`foo2`，`foo10` 和 `bar`
+
+    `rm foo?` 这条命令会删除 `foo1` 和 `foo2`
+
+     `rm foo*` 则会删除除了 `bar` 之外的所有文件
+
+- 花括号 `{}` - 当你有一系列的指令，其中包含一段公共子串时，可以用花括号来自动展开这些命令
+
+    这在批量移动或转换文件时非常方便
+
+```sh
+convert image.{png,jpg}
+# 会展开为
+convert image.png image.jpg
+
+cp /path/to/project/{foo,bar,baz}.sh /newpath
+# 会展开为
+cp /path/to/project/foo.sh /path/to/project/bar.sh /path/to/project/baz.sh /newpath
+
+# 也可以结合通配使用
+mv *{.py,.sh} folder
+# 会移动所有 *.py 和 *.sh 文件
+
+mkdir foo bar
+
+# 下面命令会创建 foo/a, foo/b, ... foo/h, bar/a, bar/b, ... bar/h 这些文件
+touch {foo,bar}/{a..h}
+```
+
+
+
+
+
+
+
+
+
+## 4 Shell 工具
+
+
+
+
+
+
+
+
+
+
+
+# Git
+
+## 1 概述
+
+git 是一个开源的分布式版本控制系统，可以有效、高速地处理从很小到非常大的项目版本管理
+
+![](assets/git1.png)
+
+
+
+
+
+git 的工作流程：
+
+![](assets/git2.png)
+
+1. clone：从远程仓库中==克隆==代码到本地仓库
+2. checkout：从本地仓库中==检出==一个仓库分支然后进行修订
+3. add：在提交前先将代码==提交==到暂存区
+4. commit：==提交==到本地仓库，本地仓库中保存修改的各个历史版本
+5. fetch：从远程库，==抓取==到本地仓库，不进行任何的合并动作，一般操作比较少
+6. pull：从远程库==拉取==到本地库，自动进行合并（merge），然后放到到工作区，相当于 `fetch+merge`
+7. push：修改完成后，需要和团队成员共享代码时，将代码==推送==到远程仓库
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 2 下载与配置
+
+下载地址：
+
+[https://git-scm.com/download](https://git-scm.com/download) 
+
+
+
+基本配置：
+1. 打开Git Bash
+
+2. 设置用户信息
+
+```sh
+# 设置用户名和邮箱
+git config --global user.name "xxxx"
+git config --global user.email "xxx@xxx.xxx"
+
+# 查看配置信息
+git config --global user.name
+git config --global user.email
+```
+
+
+
+
+
+常用指令配置别名：
+
+```sh
+# 创建.bashrc
+touch ~/.bashrc
+
+# 在.bashrc中加入以下内容
+alias git-log='git log --pretty=oneline --all --graph --abbrev-commit'	#用于输出git提交日志
+alias ll='ls -al'	#用于输出当前目录所有文件及基本信息
+
+# 执行.bashrc
+source ~/.bashrc
+```
+
+注意：
+
+`.bashrc` 是 home 目录下的一个 shell 文件，用于储存用户的个性化设置（若是 Windows 系统则在 `C:\Users\用户名` 下）
+
+
+
+
+
+防止乱码：
+
+```sh
+# 输出文件路径使用原始字符
+git config --global core.quotepath false
+
+# C:\Program Files\Git\etc\bash.bashrc 文件最后加入下面两行
+export LANG="zh_CN.UTF-8"
+export LC_ALL="zh_CN.UTF-8"
+```
+
+
+
+
+
+
+
+
+
+
+
+## 3 本地操作
+
+1. 将当前目录下初始化为本地 Git 仓库
+
+```sh
+git init
+```
+
+
+
+![](assets/本地仓库.png)
+
+
+
+2. 查看暂存区、工作区的修改的状态
+
+```sh
+git status
+```
+
+
+
+3. 提交工作区到暂存区
+
+```sh
+git add 单个文件名	# 提交单个文件
+git add 通配符		 # 提交所有匹配的文件
+
+# 例
+git add hello.cpp	# 提交一个文件
+git add *.txt		# 提交所有 txt 文件
+git add log*.txt	# 提交所有 log 开头的 txt 文件
+git add docs/		# 提交所有 /docs 目录下的文件
+git add .			# 提交所有且包括隐藏文件
+git add *			# 提交所有不包括隐藏文件
+```
+
+
+
+4. 提交暂存区到本地仓库
+
+```sh
+git commit -m '注释内容'
+```
+
+
+
+5. 查看提交日志
+
+```sh
+git log [option]	# option 为可选参数
+git-log		# 已经在配置中设置了可选参数
+```
+
+
+
+6. 版本回退（切换到其他版本）
+
+```sh
+git reset --hard commitID
+# commitID 可以使用 git-log 或 git log 指令查看
+
+# 查看已经删除的记录
+git reflog
+```
+
+注意：`commitID` 可以选40个字符的或7个字符的
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 4 分支合并
+
+分支的作用：可以把你的工作从开发主线上分离开来进行重大的 Bug 修改、开发新的功能，以免影响开发主线
+
+
+
+分支操作：
+
+```sh
+# 查看本地分支
+git branch
+# 创建本地分支
+git branch 分支名
+
+# 切换分支
+git checkout 分支名
+# 创建并切换分支
+git checkout -b 分支名
+
+# 合并分支
+# 将另一个分支上的提交合并到所在分支
+git merge 分支名称
+
+# 删除分支
+# 不能删除当前分支, 只能删除其他分支
+git branch -d 分支名	# 会检查分支是否已被合并
+git branch -D 分支名	# 不做任何检查, 强制删除
+```
+
+
+
+
+
+解决冲突：
+
+当两个分支上对文件的修改可能会存在冲突，例如同时修改了同一个文件的同一行，这时就需要手动解决冲突
+
+1. 打开冲突文件自己修改冲突内容
+2. 将解决完冲突的文件加入暂存区，并提交到仓库
+
+注意：git 会以你自己修改的内容为主（有冲突就自己重写）
+
+
+
+![](assets/merge.png)
+
+
+
+
+
+常见分支：
+
+* `master`
+
+    线上分支，主分支，中小规模项目作为线上运行的应用对应的分支；
+
+* `develop`
+
+    是从master创建的分支，一般作为开发部门的主要开发分支
+
+    阶段开发完成后，需要是合并到master分支，准备上线
+
+* `feature/xxxx`
+
+    从develop创建的分支，一般是同期并行开发，但不同期上线时创建的分支
+
+    分支上的研发任务完成后合并到develop分支
+
+* `hotfix/xxxx`
+
+    从master派生的分支，一般作为线上bug修复使用
+
+    修复完成后需要合并到master、test、develop分支
+
+* 其他分支，在此不再详述，例如`test`（用于代码测试）、`pre`（预上线分支）等等
+
+![](assets/分支.png)
+
+
+
+
+
+
+
+
+
+
+
+## 5 远程仓库配置
+
+以 gitee 为例：
+
+1. 注册码云
+2. 创建远程仓库
+
+<img src="assets/创建远程仓库.png" style="zoom: 67%;" /> 
+
+
+
+3. 配置SSH公钥
+
+```sh
+# 生成SSH公钥
+# 如果公钥已经存在, 则自动覆盖
+ssh-keygen -t rsa
+
+# 获取公钥
+cat ~/.ssh/id_rsa.pub
+
+# 将公钥连接到gitee账户
+
+# 验证是否配置成功
+ssh -T git@gitee.com
+```
+
+
+
+<img src="assets/配置公钥.png" style="zoom:67%;" /> 
+
+
+
+
+
+
+
+
+
+
+
+## 6 远程仓库操作
+
+1. 添加远程仓库：
+
+此操作是先初始化本地库，然后与已创建的远程库进行对接
+
+```sh
+git remote add <远端名称> <仓库路径>
+```
+
+远端名称，默认是 `origin`，取决于远端服务器设置
+
+仓库路径，从远端服务器获取此URL（直接复制远程仓库的网址）
+
+<img src="assets/公钥地址.png" style="zoom: 80%;" /> 
+
+
+
+
+
+2. 查看远程仓库
+
+```sh
+git remote
+```
+
+
+
+3. 推送到远程仓库
+
+```sh
+git push [-f] [--set-upstream] [远端名称 [本地分支名][:远端分支名] ]
+# -f 表示强制覆盖
+# --set-upstream 推送到远端的同时并建立起和远端分支的关联关系
+
+# 远程分支名和本地分支名称相同, 则可以只写本地分支
+git push origin master
+
+# 建立两个分支的关联
+git push --set-upstream origin master:master	# 分支名相同可以省略
+git push --set-upstream origin master
+
+# 若当前分支已经和远端分支关联, 则可以省略分支名和远端名
+git push
+```
+
+
+
+4. 查看关联关系
+
+```sh
+git branch -vv
+```
+
+
+
+5. 仓库克隆
+
+```sh
+git clone <仓库路径> [本地目录]		# 本地目录可以省略, 会自动生成一个目录
+```
+
+
+
+6. 抓取和拉取
+
+```sh
+# 抓取
+# 抓取指令就是将仓库里的更新都抓取到本地, 不会进行合并
+git fetch [remote name] [branch name]
+
+# 拉取
+# 拉取指令就是将远端仓库的修改拉到本地并自动进行合并, 等同于fetch+merge
+git pull [remote name] [branch name]
+```
+
+注意：
+
+* 如果抓取和拉取不指定远端名称和分支名，则抓取所有分支
+
+* 若在一段时间，A、B用户修改了同一个文件，且修改了同一行位置的代码，此时会发生合并冲突
+
+    A用户在本地修改代码后优先推送到远程仓库，此时B用户在本地修订代码，提交到本地仓库后，也需要推送到远程仓库
+
+    此时B用户晚于A用户，故需要先拉取远程仓库的提交，经过合并后才能推送到远端分支
+
+![](assets/远程仓库冲突.png)
+
+
+
+
+
+
+
+# CMake
+
+## 1 安装
+
+[CMake下载地址](https://cmake.org/download/)，[MinGW下载地址](https://sourceforge.net/projects/mingw-w64/files/mingw-w64/)
+
+
+
+* CMake 是一个开源的跨平台构建系统生成工具，用于自动化构建过程
+
+    它通过读取配置文件（通常是 `CMakeLists.txt` 文件）来生成适合目标平台的本地构建文件
+
+* MinGW是一个开源的编译器套件，旨在将GNU工具链（包括GCC编译器）引入到Windows平台
+
+
+
+为了能在终端中使用他们，需要将他们目录下的 `bin` 文件夹加入到环境变量中
+
+若安装了 Qt 可以不重复下载，将 Qt 目录下的 `/Tools/CMake_64/bin` 和 `/Tools/mingwxxxx_64/bin` 加入环境变量
+
+VS 中自带 `MSVC`，构建的时候如果显示的是 VS 的路径，说明调用了 `MSVC` 的 `cl.exe`， `MSVC` 的编译输出路径和 `MinGW` 不同
+
+
+
+使用下述指令来查看是否成功配置：
+
+```sh
+gcc -v
+cmake
+```
+
+
+
+
+
+
+
+
+
+
+
+## 2 构建
+
+[CMake官方使用文档](https://cmake.org/cmake/help/latest/)
+
+
+
+在使用 CMake 构建的程序中，像 `src`、`build`、`include` 这些文件夹有不同的作用，通常它们会按照下面的结构来组织：
+
+1. `src`（源代码目录）
+
+    - 存放项目的源代码文件（如`.cpp`、`.h`、`.c` 等文件）
+    - 这里包括了项目的核心实现逻辑代码，通常 CMake 的 `CMakeLists.txt` 会指定该目录中的文件，以便进行编译
+
+2. `build`（构建目录）
+
+    - 用来存放构建过程中的中间文件和最终的可执行文件
+
+    - `build`目录是 CMake 生成的构建目录，其中包含了 CMake 生成的 Makefile、构建脚本和中间文件（如编译的对象文件 `.o` 或 `.obj`）
+
+        通常不会直接在 `src` 目录下进行编译，而是在 `build` 目录中创建一个单独的构建环境，这样可以保持源代码目录的干净
+
+3. `include`（头文件目录）
+
+    - 存放项目的头文件（`.h`、`.hpp` 等）
+
+    - 头文件定义了类、函数的接口，通常会被 `src` 中的源文件引用
+
+    - 在 `CMakeLists.txt` 文件中，通常会通过 `include_directories()` 或 `target_include_directories()` 告诉 CMake 头文件的路径
+
+        以便编译器能够找到这些文件
+
+
+
+**项目结构示例：**
+
+```cmake
+project/				 # 根目录
+├── CMakeLists.txt       # CMake配置文件
+├── src/                 # 源代码目录
+│   ├── main.cpp
+│   └── some_file.cpp
+├── build/               # 构建目录
+│   ├── CMakeCache.txt   # CMake缓存文件
+│   ├── Makefile         # Makefile文件（如果使用Make构建）
+│   └── ...
+└── include/             # 头文件目录（可选）
+```
+
+
+
+cmake 模板：
+
+```cmake
+cmake_minimum_required(VERSION 3.10)
+
+project(项目名)
+
+add_executable(项目名 main.cpp)
+```
+
+
+
+在 `build` 目录下输入以下指令：
+
+```sh
+cmake ../src		# 构建系统
+cmake -G "MinGW Makefiles" ../src
+# 安装了VS可能会优先调用
+
+cmake --build .		# 编译
+
+./项目名.exe		  # 运行
+```
+
+
+
+注意：
+
+- cmake 命令不区分大小写，但是参数、变量区分大小写
+- 参数用空格或分号隔开
+- 使用 `${VAR}` 引用变量
+- 引号可加可不加，但如果字符串中有空格必须加
+
+
+
+
+
+
+
+## 3 常用命令
+
+cmake 相关概念：
+
+- 目标文件（`target`）：可执行文件（`add_executable`）、库文件（`add_library`）
+- 命令（cmake-command）：下面要讲的函数
+- 变量（cmake-variable）：以`CMAKE_`开头的变量名
+- 属性（cmake-properties）：文件/文件夹都有各自的属性
+
+
+
+### 3.1 cmake_minimum_required
+
+设置最低cmake版本
+
+```cmake
+cmake_minimum_required(VERSION <min>)
+
+# 例
+cmake_minimum_required(VERSION 3.10)
+```
+
+
+
+### 3.2 project
+
+设置项目名
+
+```cmake
+project(<PROJECT-NAME>					# 设置项目名
+        [VERSION <major>				# 设置版本号
+        [LANGUAGES <language-name>		# 设置使用语言
+		...])
+
+# 项目名会被存储在变量 PROJECT_NAME 和 CMAKE_PROJECT_NAME 中
+# PROJECT_SOURCE_DIR 等价于 <PROJECT-NAME>_SOURCE_DIR , 指项目的源文件所在的目录, 默认为包含根 CMakeLists.txt 文件的目录
+# PROJECT_BINARY_DIR 等价于 <PROJECT-NAME>_BINARY_DIR , 指项目的构建目录, 通常为 /build
+
+# 例
+project(Tutorial)
+project(Tutorial C CXX)
+project(Tutorial VERSION 2.3 LANGUAGES CXX)
+```
+
+
+
+### 3.3 add_executable
+
+用指定的源文件为项目添加可执行文件，添加 `target`
+
+```cmake
+add_executable(<name> [WIN32] [MACOSX_BUNDLE]
+               [EXCLUDE_FROM_ALL]
+               [source1] [source2 ...])
+
+# <name>即生成可执行文件的名字（与项目名没有关系），在一个项目中必须唯一
+# 如windows系统会生成<name>.exe文件
+
+# 例
+add_executable(Tutorial tutorial.cxx)
+```
+
+
+
+### 3.4  message
+
+打印信息
+
+```cmake
+message([<mode>] "message text" ...)
+
+# STATUS 前缀为--的信息
+# SEND_ERROR 产生错误，跳过生成过程
+# FATAL_ERROR 产生错误，终止运行
+
+# 例
+message(${PROJECT_NAME})	# 打印项目名
+message(STATUS "Hello world!")
+```
+
+
+
+### 3.5 set
+
+将变量设置为指定值
+
+```cmake
+set(<variable> <value>)
+
+# 例
+set(CMAKE_CXX_STANDARD 11)		#  设置C++标准
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)		# 设置运行时目标文件（exe、dll）的输出位置
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)		# 设置存档目标文件（lib、a）的输出位置
+```
+
+
+
+### 3.6 target_include_directories
+
+指定头文件搜索路径
+
+```cmake
+include_directories(dir1 [dir2 ...])
+
+# 该路径会被添加到当前目录和其子目录的头文件搜索路径中, 并保存在 INCLUDE_DIRECTORIES 属性中
+# 每个目标文件可以有多个搜索路径, 可以使用 dir2 参数
+
+target_include_directories(<target> <INTERFACE|PUBLIC|PRIVATE> <dir> [...])
+# 为特定的 target 设置头文件搜索路径, 它不影响其他目标的编译过程, 更推荐使用
+
+# 例
+include_directories(/include)
+include_directories(${PROJECT_BINARY_DIR})	# 为整个项目添加头文件搜索路径
+target_include_directories(my_executable PRIVATE /path/to/include)
+# 使用 PUBLIC 时, 表示该头文件路径只影响当前目标的编译
+target_include_directories(my_library PUBLIC /path/to/include /another/path)
+# 使用 PRIVATE 时, 链接到该目标的其他目标会继承此头文件路径
+```
+
+
+
+### 3.7 target_link_libraries
+
+为目标链接库
+
+```cmake
+target_link_libraries(<target> <PRIVATE|PUBLIC|INTERFACE> <library1> <library2> [...])
+
+# library 是要链接到目标的库, 可以是 target 或绝对路径
+# 将指定的库链接到一个目标上, 确保该目标在编译时可以找到并正确链接到这些库
+
+# 例
+target_link_libraries(myapp PRIVATE mylib)	# 将 mylib 库链接到 myapp 可执行文件
+```
+
+
+
+### 3.8 其他
+
+[CMake命令文档](https://cmake.org/cmake/help/latest/manual/cmake-commands.7.html)
+
+
+
+
+
+
+
