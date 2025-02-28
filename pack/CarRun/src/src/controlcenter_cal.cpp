@@ -68,24 +68,6 @@ public:
         intersectionLeft = searchLeftIntersection(track.pointsEdgeLeft);
         intersectionRight = searchRightIntersection(track.pointsEdgeRight);
 
-        // // 连续弯道判断
-        // if (track.stdevLeft > 280 && track.stdevRight < 210)            // 右转连续
-        // {
-        //     // 有效边缘行获取
-        //     //coiled_validRowsCal_right(track.pointsEdgeLeft, track.pointsEdgeRight);
-        //     // 赛道类型，定义为右急转弯
-        //     style = "RIGHTCC";
-        // }
-        // else if(track.stdevRight > 280 && track.stdevLeft < 210)        // 左转连续
-        // {
-        //     // 有效边缘行获取
-        //     //coiled_validRowsCal_left(track.pointsEdgeLeft, track.pointsEdgeRight);
-        //     // 赛道类型，定义为左急转弯
-        //     style = "LEFTCC";
-        // }
-        /******使用近处点斜率和远处点斜率判断是否连续弯道*******/
-
-
         // 边缘有效行优化，左边方差大右边方差小；或者左边小右边大，就是转弯。将边缘没用的边线优化
         if ((track.stdevLeft < 60 && track.stdevRight > 60) || (track.stdevLeft > 60 && track.stdevRight < 60))
         {
@@ -154,57 +136,17 @@ public:
         }
         else if (track.pointsEdgeLeft.size() > 4 && track.pointsEdgeRight.size() == 0) // 左单边
         {
-            // if(enum_RoadType == 4)
-            // {
-                // 手动给单边补七个点
                 for(int i = 0;i < 7;i++)
                     track.pointsEdgeRight.push_back(POINT(ROWSIMAGE - track.rowCutBottom - i, COLSIMAGE - 1));
                 centerEdge = bezier_curve_fitting(track.pointsEdgeLeft, track.pointsEdgeRight);
-            // }
-            // else
-            // {
-            //     v_center[0] = {(track.pointsEdgeLeft[0].x + ROWSIMAGE - 1) / 2,
-            //                 (track.pointsEdgeLeft[0].y + COLSIMAGE - 1) / 2};
-
-            //     v_center[1] = {(track.pointsEdgeLeft[track.pointsEdgeLeft.size() / 3].x + ROWSIMAGE - 1) / 2,
-            //                 (track.pointsEdgeLeft[track.pointsEdgeLeft.size() / 3].y + COLSIMAGE - 1) / 2};
-
-            //     v_center[2] = {(track.pointsEdgeLeft[track.pointsEdgeLeft.size() * 2 / 3].x + ROWSIMAGE - 1) / 2,
-            //                 (track.pointsEdgeLeft[track.pointsEdgeLeft.size() * 2 / 3].y + COLSIMAGE - 1) / 2};
-
-            //     v_center[3] = {(track.pointsEdgeLeft[track.pointsEdgeLeft.size() - 1].x + ROWSIMAGE - 1) / 2,
-            //                 (track.pointsEdgeLeft[track.pointsEdgeLeft.size() - 1].y + COLSIMAGE - 1) / 2};
-
-            //     centerEdge = Bezier(0.02, v_center);
-            // }
 
             style = "RIGHT_D";
         }
         else if (track.pointsEdgeLeft.size() == 0 && track.pointsEdgeRight.size() > 4) // 右单边
         {
-            // if(enum_RoadType == 4)
-            // {
-                // 手动给单边补七个点
                 for(int i = 0;i < 7;i++)
                     track.pointsEdgeLeft.push_back(POINT(ROWSIMAGE - track.rowCutBottom - i, 0));
                 centerEdge = bezier_curve_fitting(track.pointsEdgeLeft, track.pointsEdgeRight);
-            // }
-            // else
-            // {
-            //     v_center[0] = {(track.pointsEdgeRight[0].x + ROWSIMAGE - 1) / 2,
-            //                     (track.pointsEdgeRight[0].y) / 2};
-
-            //     v_center[1] = {(track.pointsEdgeRight[track.pointsEdgeRight.size() / 3].x + ROWSIMAGE - 1) / 2,
-            //                 (track.pointsEdgeRight[track.pointsEdgeRight.size() / 3].y) / 2};
-
-            //     v_center[2] = {(track.pointsEdgeRight[track.pointsEdgeRight.size() * 2 / 3].x + ROWSIMAGE - 1) / 2,
-            //                 (track.pointsEdgeRight[track.pointsEdgeRight.size() * 2 / 3].y) / 2};
-
-            //     v_center[3] = {(track.pointsEdgeRight[track.pointsEdgeRight.size() - 1].x + ROWSIMAGE - 1) / 2,
-            //                 (track.pointsEdgeRight[track.pointsEdgeRight.size() - 1].y) / 2};
-
-            //     centerEdge = Bezier(0.02, v_center);
-            // }
 
             style = "LEFT_D";
         }
@@ -229,69 +171,8 @@ public:
             style = "LEFT";
         }
 
-        // {//逆透视寻找中线
-        //     std::vector<POINT> perspectiveMid;//俯视域下的中线点集
-        //     std::vector<POINT> centerFrom_perspectiveMid;//相机坐标系中的中线点集
-        //     if(track.pointsEdgeLeft.size() > track.pointsEdgeRight.size() && abs(track.pointsEdgeLeft.size() - track.pointsEdgeRight.size()) > track.pointsEdgeLeft.size() / 2)
-        //     {
-        //         perspectiveMid = track.perspectiveMidFromLeft(3);
-        //     }
-        //     else if(track.pointsEdgeLeft.size() < track.pointsEdgeRight.size() && abs(track.pointsEdgeLeft.size() - track.pointsEdgeRight.size()) > track.pointsEdgeRight.size() / 2)
-        //     {
-        //         perspectiveMid = track.perspectiveMidFromRight(3);
-        //     }
-
-        //     centerFrom_perspectiveMid = track.line_perspectiveInv(perspectiveMid);//逆透视得到相机坐标系中线
-        //     if(centerFrom_perspectiveMid.size() > 10)
-        //     {
-        //         centerEdge.clear();
-        //         // centerEdge = bezier_curve_fitting(centerFrom_perspectiveMid);//根据中线点集重新拟合中线
-        //         centerEdge = centerFrom_perspectiveMid;
-        //         style += "Inv";
-        //     }
-        // }
-
         // 拷贝一份中线由于优化控制
         centerEdge_yh = centerEdge;
-
-        // /******根据中线斜率来对连续弯道进行判断******/
-        // // 1.先进行斜率的计算
-        // double line_k_up, line_k_down;
-        // if(centerEdge.size() > 5)
-        // line_k_down = perspectiveTangentSlope(centerEdge, 5, 2);
-        // if(centerEdge.size() > 5)
-        //     line_k_up = perspectiveTangentSlope(centerEdge, centerEdge.size() - 5, 2);
-
-        // // 2.通过斜率判断是否连续弯道，以及连续弯道方向
-        // if(line_k_up < 0 && line_k_down > 0) 
-        //     style = "LEFTCC";                  // 左连续转弯
-        // else if(line_k_up > 0 && line_k_down < 0) 
-        //     style = "RIGHTCC";                 // 右连续转弯
-
-        // // 3.通过转弯类型来处理中线
-        // if(style == "RIGHTCC")
-        // {
-        //     // 寻找拐点
-        //     int num_point = right_search_value(centerEdge);
-        //     // 去除拐点以上的点
-        //     if(num_point != 0)
-        //     {
-        //         if(centerEdge[num_point].x < 220)
-        //             centerEdge.resize(num_point);
-        //     }
-        // }
-        // else if(style == "LEFTCC")
-        // {
-        //     // 寻找拐点
-        //     int num_point = left_search_value(centerEdge);
-        //     // 去除拐点以上的点
-        //     if(num_point != 0)
-        //     {
-        //         if(centerEdge[num_point].x < 220)
-        //             centerEdge.resize(num_point);
-        //     }
-        // }
-
 
         // 加权控制中心计算
         double controlNum = 0;
@@ -340,20 +221,6 @@ public:
             controlCenter = COLSIMAGE;
         else if (controlCenter < 0)
             controlCenter = 0;
-
-        // // 控制率计算
-        // if (centerEdge.size() > 20)
-        // {
-        //     vector<POINT> centerV;
-        //     int filt = centerEdge.size() / 5;
-        //     for (int i = filt; i < centerEdge.size() - filt; i++) // 过滤中心点集前后1/5的诱导性
-        //     {
-        //         centerV.push_back(centerEdge[i]);
-        //     }
-        //     sigmaCenter = sigma(centerV);
-        // }
-        // else
-        //     sigmaCenter = 1000;
 
         // 计算拟合中心线的斜率
         sigmaCenter = track.stdevEdgeCal(centerEdge, 4);
