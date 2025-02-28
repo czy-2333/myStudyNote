@@ -1,0 +1,14 @@
+{
+    "DangerCheck": 2,
+    "rowCheck": 40,
+    "SpeedUp": 0.9,
+    
+    "record": [
+        {
+            "#DangerCheck": "危险区确认帧数",
+            "#rowCheck": "开始判断危险区的行数",
+            "#SpeedUp": "危险区速度"
+            
+        }
+    ]
+}

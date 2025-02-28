@@ -1,0 +1,6 @@
+{
+    "cmake.sourceDirectory": "/root/workspace/CarRun_HuaHai_UpperComputer/src",
+    "files.associations": {
+        "vector": "cpp"
+    }
+}
