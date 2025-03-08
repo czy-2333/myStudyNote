@@ -1,4 +1,4 @@
-# shell
+# Shell
 
 ## 1 Shell 基础
 
@@ -372,6 +372,10 @@ grep -l "hello" *.txt
 ```sh
 grep -E "hello|world" file.txt
 # 使用正则匹配, 匹配 "hello" 或 "world"
+
+grep -P '^([0-9]{3}-|\([0-9]{3}\) )[0-9]{3}-[0-9]{4}$' file.txt
+# 使 grep 能够使用更强大的正则表达式语法
+# 匹配 (xxx) xxx-xxxx 或 xxx-xxx-xxxx 格式的电话号码
 ```
 
 
@@ -453,7 +457,7 @@ sort -o filename filename
 
 ```sh
 sort filename | uniq -c
-# uniq -c 统计每个单词出现的次数
+# uniq -c 统计每个单词出现的次数 数字在前, 字母在后
 
 echo -e "apple\nbanana\napple\norange\nbanana" | sort | uniq -c
 #  2 apple
@@ -468,6 +472,63 @@ echo -e "apple\nbanana\napple\norange\nbanana" | sort | uniq -c
 ```sh
 sort -R filename
 # 选项会随机打乱行顺序（不保证真正的随机, 每次结果可能不同）
+```
+
+
+
+
+
+
+
+#### 2.1.8 head 和 tail
+
+`tail` 和 `head` 分别可以用于显示文件的**末尾**和**开头**部分
+
+
+
+1. head
+
+```sh
+head file.txt
+# 显示 file.txt 的前 10 行（默认）
+
+head -n 20 file.txt
+# 显示 file.txt 的前 20 行
+
+head -c 50 file.txt
+# 显示 file.txt 的前 50 字节
+
+head file1.txt file2.txt
+# 显示多个文件的前 10 行
+```
+
+
+
+2. tail
+
+```sh
+tail file.txt
+# 显示 file.txt 的后 10 行（默认）
+
+tail -n 20 file.txt
+# 显示 file.txt 的后 20 行
+
+tail -c 50 file.txt
+# 显示 file.txt 的后 50 字节
+
+tail -f log.txt
+# 实时监视 log.txt 的变化
+# 当 log.txt 更新时, tail -f 会实时输出新内容
+
+tail -f log.txt | grep "ERROR"
+# 实时查看 log.txt 中包含 "ERROR" 的行
+# 检查 日志 中的报错
+
+
+# head 和 tail 组合使用
+head -n 20 file.txt | tail -n 10
+# 先用 head -n 20 取前 20 行
+# 再用 tail -n 10 取最后 10 行, 即 11~20 行
 ```
 
 
@@ -733,6 +794,10 @@ Shell 脚本的文件通常以 `.sh` 结尾，并且需要赋予可执行权限�
 
 
 
+
+
+
+
 ### 3.1 赋值
 
 在 bash 中为变量赋值的语法是 `foo=bar`
@@ -743,13 +808,15 @@ Shell 脚本的文件通常以 `.sh` 结尾，并且需要赋予可执行权限�
 
 
 
-需要注意的是，`foo = bar` （使用空格隔开）是不能正确工作的，因为解释器会调用程序 `foo` 并将 `=` 和 `bar` 作为参数
+注意：
 
-在 shell 脚本中使用空格会起到分割参数的作用，有时候可能会造成混淆，请务必多加检查。
+* `foo = bar` （使用空格隔开）是不能正确工作的，因为解释器会调用程序 `foo` 并将 `=` 和 `bar` 作为参数
 
-Bash 中的字符串通过 `'` 和 `"` 分隔符来定义，但是它们的含义并不相同
+    在 shell 脚本中使用空格会起到分割参数的作用，有时候可能会造成混淆，请务必多加检查
 
-以 `'` 定义的字符串为原义字符串，其中的变量不会被转义，而 `"` 定义的字符串会将变量值进行替换
+* Shell 中的字符串通过 `'` 和 `"` 分隔符来定义，但是它们的含义并不相同
+    * 以 `'` 定义的字符串为原义字符串，其中的变量不会被转义
+    * 而 `"` 定义的字符串会将变量值进行替换
 
 
 
@@ -769,19 +836,109 @@ echo '$foo'
 
 
 
-### 3.2 条件与循环
+### 3.2 注释
 
-和其他大多数的编程语言一样，`bash` 也支持 `if`，`case`，`while` 和 `for` 这些控制流关键字
+在 Shell 脚本中，注释的写法如下
 
 
 
-#### 3.2.1 if
+1. 单行注释
+
+使用 `#` 号开头：
 
 ```sh
-if [ condition ]; then
+# 这是一个单行注释
+echo "Hello, World!"  # 这也是注释, Shell 只执行 echo 命令
+```
+
+
+
+2. 多行注释
+
+Shell 没有直接支持多行注释的语法，但可以使用其他方法来实现
+
+```sh
+# 使用多行 #
+# 这是第一行注释
+# 这是第二行注释
+# 这是第三行注释
+
+# 使用 : <<EOF
+: <<EOF
+这是一段多行注释
+Shell 不会执行这里的内容
+可以写很多行
+EOF
+```
+
+说明：
+
+- `:` 是 Shell 的空命令，相当于 `true`，不会执行 `<<EOF` 之后的内容
+- `EOF` 也可以换成其他标识符，如 `COMMENT`（任意合法字符串），但首尾必须一致
+
+
+
+
+
+
+
+### 3.3 判断
+
+#### 3.3.0 判断符
+
+Shell 可以使用大部分其他语言中的运算符，但条件判断符出现了一些改变
+
+用于在 Shell 脚本中判断某些条件是否成立，从而决定是否执行某些操作
+
+1. 数值比较：
+    * `-eq`：等于
+    * `-ne`：不等于
+    * `-lt`：小于
+    * `-le`：小于或等于
+    * `-gt`：大于
+    * `-ge`：大于或等于
+
+
+
+2. 字符串比较：
+    * `=`：等于（）
+    * `!=`：不等于
+    * `-z`：字符串长度为零
+    * `-n`：字符串长度不为零
+
+
+
+3. 文件测试：
+    * `-e`：文件存在
+    * `-d`：目录存在
+    * `-f`：普通文件存在
+    * `-r`：文件可读
+    * `-w`：文件可写
+    * `-x`：文件可执行
+
+
+
+
+
+
+
+#### 3.3.1 if
+
+注意：
+
+* 在条件语句后需要跟 `then`
+
+* 可以根据需求使用 `if` 结构， `if-else` 结构， `if-elif` 结构， `if-elif-else` 结构
+
+    `elif` 相当于 `else if` 可以使用多次
+
+```sh
+if [ condition1 ]; then
     # 如果 condition 为 true 执行的命令
-elif [ another_condition ]; then
+elif [ condition2 ]; then
     # 如果 another_condition 为 true 执行的命令
+# elif [ condition3 ]; then
+#	...
 else
     # 如果以上条件都不成立时执行的命令
 fi
@@ -797,17 +954,19 @@ else
 fi
 ```
 
+
+
+
+
+
+
+#### 3.3.2 case
+
 注意：
 
-* `-gt` 表示大于，`-ge` 表示大于等于
-
-* `-lt` 表示小于，`-le` 表示小于等于
-
-* `-eq` 表示等于，`-ne` 表示不等于
-
-
-
-#### 3.2.2 case
+* 相当于其他编程语言中的 `switch` 语句
+* 每个模式后面必须跟着 `;; `来结束该模式的匹配
+* 表示默认匹配，即当没有任何模式匹配时执行的命令
 
 ```sh
 case $variable in
@@ -839,7 +998,46 @@ esac
 
 
 
-#### 3.2.3 for
+
+
+
+
+#### 3.3.3 判断语句
+
+当判断一个条件成立是否成立时，需要用 `[]` 或 `[[]]` 将条件框起来
+
+* `[ ... ]` 是旧式的条件判断，兼容性更好，但功能较少，不支持 `&&` 和 `||` 这样的逻辑运算符
+
+- `[[ ... ]]` 是一种扩展的条件判断语法，支持更多的运算符和逻辑操作
+
+```sh
+# [[]]
+if [[ $num -ge 10 && $num -le 20 ]]; then
+    echo "num 在 10 到 20 之间"
+fi
+
+# []
+if [ $num -ge 10 ] && [ $num -le 20 ]; then
+    echo "num 在 10 到 20 之间"
+fi
+```
+
+
+
+
+
+
+
+
+
+### 3.4 循环
+
+#### 3.4.1 for
+
+注意：
+
+* Shell 中的 `for` 循环相当于 c++ 中的高级 `for` 用于遍历一组值，通常用于固定次数的迭代，或者遍历一个列表或范围
+* Shell 中可以使用 `{l..r}` 来表示一组 `l` 到 `r` 的数字范围
 
 ```sh
 # for
@@ -848,16 +1046,26 @@ for variable in value1 value2 value3; do
 done
 
 # 例
+# 遍历范围
 for i in {1..5}; do
     echo "Number $i"
 done
+
+# 遍历列表
+for fruit in apple banana cherry; do
+    echo "我喜欢 $fruit"
+done
 ```
 
-注意：`{1..5}` 表示从 `1` 到 `5` 的数字范围
 
 
 
-#### 3.2.4 while
+
+
+
+#### 3.4.2 while
+
+`while` 循环会在条件为真时反复执行指定的命令，直到条件为假
 
 ```sh
 while [ condition ]; do
@@ -867,7 +1075,7 @@ done
 # 例
 while [ $x -le 5 ]; do
     echo "Number $x"
-    ((x++))  # 增加 x 的值
+    ((x++))  # x 自增
 done
 ```
 
@@ -875,7 +1083,66 @@ done
 
 
 
-### 3.3 函数
+#### 3.4.3 until
+
+`until` 循环和 `while` 循环类似，但它的条件是==直到条件成立==
+
+也就是说，`until` 循环会在条件为假时执行，直到条件为真
+
+```sh
+until [ condition ]; do
+    # 执行的命令
+done
+
+# 例
+x=1
+until [ $x -gt 5 ]; do
+    echo "Number $x"
+    ((x++))  # x 自增
+done
+```
+
+
+
+
+
+
+
+#### 3.4.4 跳转语句
+
+Shell 中依然可以使用 `break` 和 `continue`
+
+1. `break`：用于退出当前循环（无论是哪种循环）
+
+```sh
+for i in {1..10}; do
+    if [ $i -eq 5 ]; then
+        break  # 当i等于5时退出循环
+    fi
+    echo "数字是 $i"
+done
+```
+
+
+
+2. `continue`：用于跳过当前循环的剩余部分，进入下一次循环
+
+```sh
+for i in {1..10}; do
+    if [ $i -eq 5 ]; then
+        continue  # 当i等于5时跳过当前循环
+    fi
+    echo "数字是 $i"
+done
+```
+
+
+
+
+
+
+
+### 3.5 函数
 
 `bash` 支持函数，它可以接受参数并基于参数进行操作
 
@@ -896,7 +1163,7 @@ mcd () {
 
 
 
-### 3.4 返回码
+### 3.6 返回码
 
 返回码或退出状态是脚本和命令之间交流执行状态的方式
 
@@ -933,7 +1200,7 @@ false ; echo "This will always run"
 
 
 
-### 3.5 替换
+### 3.7 替换
 
 **命令替换**
 
@@ -977,7 +1244,7 @@ diff <(ls foo) <(ls bar)
 
 
 
-### 3.6 通配符
+### 3.8 通配符
 
 当执行脚本时，我们经常需要提供形式类似的参数
 
@@ -998,6 +1265,7 @@ bash 使我们可以轻松的实现这一操作，它可以基于文件扩展名
     这在批量移动或转换文件时非常方便
 
 ```sh
+# convert 图像处理
 convert image.{png,jpg}
 # 会展开为
 convert image.png image.jpg
@@ -1022,11 +1290,11 @@ touch {foo,bar}/{a..h}
 
 
 
-
-
 ## 4 Shell 工具
 
 ### 4.1 awk
+
+#### 4.1.1 相关概念
 
 `awk` 是一个 **文本处理工具**，可对匹配行进行进一步操作，如字段提取、计算、格式化输出等
 

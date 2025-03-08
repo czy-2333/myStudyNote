@@ -84,7 +84,8 @@ project/				 # 根目录
 │   ├── CMakeCache.txt   # CMake缓存文件
 │   ├── Makefile         # Makefile文件（如果使用Make构建）
 │   └── ...
-└── include/             # 头文件目录（可选）
+├── include/             # 头文件目录（可选）
+└── ...
 ```
 
 
@@ -134,14 +135,14 @@ cmake 相关概念：
 
 - 目标文件（`target`）：可执行文件（`add_executable`）、库文件（`add_library`）
 - 命令（cmake-command）：下面要讲的函数
-- 变量（cmake-variable）：以`CMAKE_`开头的变量名
+- 变量（cmake-variable）：以 `CMAKE_` 开头的变量名
 - 属性（cmake-properties）：文件/文件夹都有各自的属性
 
 
 
 ### 3.1 cmake_minimum_required
 
-设置最低cmake版本
+设置最低 cmake 版本
 
 ```cmake
 cmake_minimum_required(VERSION <min>)
@@ -231,7 +232,6 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)		# 设置存档目�
 
 ```cmake
 include_directories(dir1 [dir2 ...])
-
 # 该路径会被添加到当前目录和其子目录的头文件搜索路径中, 并保存在 INCLUDE_DIRECTORIES 属性中
 # 每个目标文件可以有多个搜索路径, 可以使用 dir2 参数
 
