@@ -33,6 +33,10 @@ int main()
 
 
 
+
+
+
+
 ### 1.2 注释
 
 **作用**：在代码中加一些说明和解释，方便自己或其他程序员程序员阅读代码
@@ -217,19 +221,22 @@ C++关键字如下：
 
 C++规定在创建一个变量或者常量时，必须要指定出相应的数据类型，否则无法给变量分配内存
 
-### 2.1 整型 int/long/short
+### 2.1 整型
+
+#### 2.1.1 整型分类
 
 **作用**：整型变量表示的是==整数类型==的数据
 
 C++中能够表示整型的类型有以下几种方式，**区别在于所占内存空间不同**：
 
-| **数据类型**                        | **占用空间**                                    | 取值范围                  |
-| ----------------------------------- | ----------------------------------------------- | ------------------------- |
-| short		             (短整型)  | 2字节                                           | -32768～32767             |
-| int				          (整型) | 4字节                                           | - 2147483648 ~ 2147483647 |
-| unsigned int        (无符号整形)    | 4字节                                           | 0～4294967296             |
-| long			           (长整形) | Windows为4字节，Linux为4字节(32位)，8字节(64位) | - 2147483648 ~ 2147483647 |
-| long long	          (长长整形)   | 8字节                                           | - 2^63 ~ 2^63-1           |
+| **数据类型**       | 类型说明       | **占用空间**                                       | 取值范围                  |
+| ------------------ | -------------- | -------------------------------------------------- | ------------------------- |
+| short              | 短整型         | 2字节                                              | -32768～32767             |
+| int                | 整型           | 4字节                                              | - 2147483648 ~ 2147483647 |
+| unsigned int       | 无符号整形     | 4字节                                              | 0～4294967296             |
+| long               | 长整形         | Windows为4字节<br/>Linux为4字节(32位)，8字节(64位) | - 2147483648 ~ 2147483647 |
+| long long          | 长长整形       | 8字节                                              | - 2^63 ~ 2^63-1           |
+| unsigned long long | 无符号长长整形 | 8字节                                              | 0 ~ 2^63-1                |
 
 
 
@@ -243,7 +250,7 @@ C++中能够表示整型的类型有以下几种方式，**区别在于所占内
 
 
 
-### 2.2 关键字 sizeof
+#### 2.1.2 关键字 sizeof
 
 **作用：**利用sizeof关键字可以==统计数据类型所占内存大小==
 
@@ -288,16 +295,18 @@ int main()
 
 
 
-### 2.3 实型（浮点型）float/double
+### 2.2 浮点型 float/double
+
+#### 2.2.1 概要
 
 **作用**：用于==表示小数==
 
 浮点型变量分为两种：
 
-1. 单精度float 
-2. 双精度double
+1. 单精度 float 
+2. 双精度 double
 
-两者的**区别**在于表示的有效数字范围不同。
+两者的**区别**在于表示的有效数字范围不同
 
 | **数据类型** | **占用空间** | **有效数字范围** |
 | ------------ | ------------ | ---------------- |
@@ -354,9 +363,85 @@ int main()
 
 
 
+#### 2.2.2 保留小数位
+
+1. C 风格
+
+C++ 继承了 C 的大部分函数库，可以使用 `printf` 和 `%f` 在输出时保留小数
 
 
-### 2.4 字符型 char
+
+**例：**
+
+```cpp
+#include <cstdio>
+
+int main()
+{
+    double num1 = 0.123456789;
+    float num2 = 5.4321;
+
+    printf("%.9lf\n", num1);
+    // 0.123456789
+    
+    printf("%.3f\n", num2);
+    // 5.432
+}
+```
+
+
+
+
+
+2. C++ 风格
+
+标准库中的 `iomanip` 头文件中的 `setprecision` 函数和 `fixed` 函数可以用来确定小数位数
+
+
+
+`fixed`：以固定小数位显示，不使用科学计数法
+
+`setprecision(n)`：控制保留 `n` 位小数
+
+
+
+**例：**
+
+```cpp
+#include <iostream>
+#include <iomanip> 
+using namespace std;
+
+int main()
+{
+    double num1 = 3.141592653589;
+    double num2 = 123.456789;
+    
+    // 设置保留 4 位小数
+    cout << fixed << setprecision(4) << num1 << endl;
+    // 3.1416
+    
+    // 保留 4 位有效数字
+    cout << setprecision(4) << num2 << endl;
+    // 123.5
+
+    return 0;
+}
+```
+
+注意：不使用 `fixed`，`setprecision` 控制的是总共的有效位数, 而不是小数点后的位数
+
+
+
+
+
+
+
+
+
+### 2.3 字符与字符串
+
+#### 2.3.1 字符型 char
 
 **作用：**字符型变量用于显示单个字符
 
@@ -370,7 +455,7 @@ int main()
 
 
 
-- C和C++中字符型变量只占用==1个字节==。
+- C 和 C++中字符型变量只占用==1个字节==。
 - 字符型变量并不是把字符本身放到内存中存储，而是将对应的ASCII编码放入到存储单元
 
 
@@ -480,7 +565,7 @@ ASCII 码大致由以下**两部分组**成：
 
 
 
-### 2.5 转义字符
+#### 2.3.2 转义字符
 
 **作用：**用于表示一些==不能显示出来的ASCII字符==
 
@@ -571,7 +656,7 @@ int main()
 
 
 
-### 2.6 字符串型 string
+#### 2.3.3 字符串型 string
 
 **作用**：用于表示一串字符
 
@@ -664,7 +749,7 @@ char *ptr = const_cast<char*>(s.c_str());	//获取字符串的字符指针
 
 
 
-### 2.7 类型转换
+### 2.4 类型转换
 
 函数转换：==C++11== 以及上
 
@@ -745,21 +830,22 @@ int main()
 
 
 
-### 2.8 布尔类型 bool
+### 2.5 布尔类型 bool
 
 **作用：**布尔数据类型代表真或假的值 
 
-bool类型只有两个值：
+bool 类型只有两个值：
 
-* true  --- 真（本质是1）
-* false --- 假（本质是0）
+* `true`  --- 真（本质是1）
+* `false` --- 假（本质是0）
 
-**bool类型占==1个字节==大小**
+**bool 类型占==1个字节==大小**，而不是一个字节的一个二进制位
 
 示例：
 
 ```C++
-int main() {
+int main()
+{
 
 	bool flag = true;
 	cout << flag << endl; // 1
@@ -777,11 +863,17 @@ int main() {
 
 
 
-### 2.9 关键字 auto
+
+
+
+
+
+
+### 2.6 关键字 auto
 
 作用：
 
-*   自动类型推导
+1. 自动类型推导
     *   当使用 `auto` 声明变量时，编译器会根据变量的初始值自动推导出变量的类型,无需手动指定类型
     *   这在处理复杂的类型声明时很有帮助，可以让代码更加简洁易读
 
@@ -791,16 +883,18 @@ auto x = 42;         // x 的类型为 int
 auto y = 3.14;       // y 的类型为 double
 auto z = "hello";    // z 的类型为 const char*
 
+auto u = [](){ return 0; };	// 返回类型位函数指针
+
 //在循环中使用自动类型推导
-std::vector<int> nums = {1, 2, 3, 4, 5};
+vector<int> nums = {1, 2, 3, 4, 5};
 for (auto it = nums.begin(); it != nums.end(); ++it)	//高级for
-    std::cout << *it << " ";
+    cout << *it << " ";
 // 输出: 1 2 3 4 5
 ```
 
 
 
-*   通用引用
+2. 通用引用
     *   当使用 `auto&&` 声明变量时，它会根据初始表达式推导出一个引用类型
     *   这在编写通用代码，如模板函数，时非常有用，可以减少重复的类型转换代码
 
@@ -824,7 +918,7 @@ int main()
 
 
 
-*   尾置返回类型
+3. 尾置返回类型
     *   当使用 `auto` 作为函数返回类型时，可以在函数体中使用 `->` 语法指定返回类型
     *   这在处理复杂的返回类型时很有帮助，可以让代码更加清晰
 
@@ -851,50 +945,42 @@ std::string result = lambda(); // result 为 "hello"
 
 
 
-### 2.a 数据的输入 cin
+### 2.7 输入输出
 
-**作用：用于从键盘获取数据**
+#### 2.7.1 基础I/O
 
-**关键字：**cin
+1. `cin`（标准输入流）
 
-**语法：** `cin >> 变量 `
+用于从标准输入（通常是键盘）读取数据
 
-示例：
+语法： `cin >> 变量`
+
+
+
+2. `cout`（标准输出流）
+
+用于向标准输出（通常是控制台）打印数据
+
+语法：`cout << 变量`
+
+
+
+例：
 
 ```C++
 int main()
 {
-	//整型输入
+    // 从键盘获取一个整数
 	int a = 0;
-	cout << "请输入整型变量：" << endl;
 	cin >> a;
 	cout << a << endl;
 
-	//浮点型输入
-	double d = 0;
-	cout << "请输入浮点型变量：" << endl;
-	cin >> d;
-	cout << d << endl;
-
-	//字符型输入
+    // 从键盘获取一个字符和一个字符串
 	char ch = 0;
-	cout << "请输入字符型变量：" << endl;
-	cin >> ch;
+    string str;
+	cin >> ch >> str;
 	cout << ch << endl;
-
-	//字符串型输入
-	string str;
-	cout << "请输入字符串型变量：" << endl;
-	cin >> str;
 	cout << str << endl;
-
-	//布尔类型输入
-	bool flag = true;
-	cout << "请输入布尔型变量：" << endl;
-	cin >> flag;
-	cout << flag << endl;
-	system("pause");
-	return EXIT_SUCCESS;
 }
 ```
 
@@ -906,6 +992,114 @@ int main()
 #define _CRT_SECURE_NO_WARNINGS		//宏需要包含在头文件前面
 #include <cstdio>
 ```
+
+
+
+
+
+
+
+#### 2.7.2 竞赛I/O
+
+在算法竞赛中，经常出现数据集超大造成 `cin` 造成的 `TLE` 情况，可以使用以下方式减缓消耗
+
+1. `tie`
+
+C++ 中，`cin` 和 `cout` 默认是绑定的，这意味着：
+
+* 在 `cout` 之前会自动刷新 `cin`，确保 `cout` 输出不会影响输入
+
+* 在 `cin` 读取数据时，`cout` 会自动刷新（即 `cout.flush()`），保证输出的内容不会影响输入
+
+这种绑定可能会导致 `I/O` 性能下降，我们可以使用 `cin.tie(0)` 和 `cout.tie(0)` 进行解绑定，进而提高效率
+
+
+
+2. `sync_with_stdio`
+
+默认情况下，C++ 的 `cin` 和 `cout` 与 C 语言的 `scanf` 和 `printf` 共享缓冲区，以确保两者可以交叉使用而不会出现混乱
+
+默认同步机制使 `printf` 的输出不会被 `cout` 盖掉
+
+但这种同步机制会增加额外的开销，从而降低输入输出的速度
+
+使用 `ios::sync_with_stdio(false)` 关闭缓冲区同步
+
+
+
+3. `endl`
+
+C++ 中 `endl` 是换行符的意思，但 `endl` 除换行外还会刷新缓冲区，加大消耗，用 `\n` 代替
+
+
+
+例：
+
+```cpp
+#include <bits/stdc++.h>	// 万能头文件
+using namespace std;
+
+int main()
+{
+	ios::sync_with_stdio(false);
+	cin.tie(0); cout.tie(0);
+	cout << 算法答案 << '\n';
+}
+```
+
+
+
+
+
+
+
+
+
+#### 2.7.3 获取整行
+
+使用 `cin` 时，它不可以包含空格和其他空白字符，当遇到空格时会直接终止，并将空格后的内容留在缓冲区
+
+`getline` 可以用于读取整行字符串，将一行的类容读入到一个字符串中（包括空格和其他空白字符）
+
+但每次用了 `cin` 后想使用 `geatline` 必须清空缓冲区（清除换行符），否则会将换行符视为一个字符串
+
+
+
+语法：`getline(cin, string)`
+
+
+
+**例：**
+
+```cpp
+int main()
+{
+	int age;
+	string name;
+	cin >> age;
+	// cin.ignore();
+	getline(cin, name);
+
+	cout << "姓名: " << name << endl;
+	cout << "年龄: " << age << endl;
+
+	// 输入
+	// 18
+	// czy
+
+	// 有 cin.ignore()
+	// 姓名: czy
+	// 年龄: 18
+
+	// 无 cin.ignore()
+	// 姓名: 
+	// 年龄: 18
+}
+```
+
+
+
+
 
 
 
@@ -960,7 +1154,7 @@ int main()
 	cout << a1 + b1 << endl;
 	cout << a1 - b1 << endl;
 	cout << a1 * b1 << endl;
-	cout << a1 / b1 << endl;  //两个整数相除结果依然是整数
+	cout << a1 / b1 << endl;  // 两个整数相除结果依然是整数
 
 	int a2 = 10;
 	int b2 = 20;
@@ -968,7 +1162,7 @@ int main()
 
 	int a3 = 10;
 	int b3 = 0;
-	//cout << a3 / b3 << endl; //报错，除数不可以为0
+	//cout << a3 / b3 << endl; // 报错，除数不可以为0
 
 
 	//两个小数可以相除
@@ -8541,7 +8735,8 @@ public:
 	//加入辅料
 	virtual void PutSomething() = 0;
 	//规定流程
-	void MakeDrink() {
+	void MakeDrink()
+    {
 		Boil();
 		Brew();
 		PourInCup();
@@ -8554,19 +8749,23 @@ class Coffee : public AbstractDrinking
 {
 public:
 	//烧水
-	virtual void Boil() {
+	virtual void Boil()
+    {
 		cout << "煮农夫山泉!" << endl;
 	}
 	//冲泡
-	virtual void Brew() {
+	virtual void Brew()
+    {
 		cout << "冲泡咖啡!" << endl;
 	}
 	//倒入杯中
-	virtual void PourInCup() {
+	virtual void PourInCup()
+    {
 		cout << "将咖啡倒入杯中!" << endl;
 	}
 	//加入辅料
-	virtual void PutSomething() {
+	virtual void PutSomething()
+    {
 		cout << "加入牛奶!" << endl;
 	}
 };
@@ -8576,30 +8775,36 @@ class Tea : public AbstractDrinking
 {
 public:
 	//烧水
-	virtual void Boil() {
+	virtual void Boil()
+    {
 		cout << "煮自来水!" << endl;
 	}
 	//冲泡
-	virtual void Brew() {
+	virtual void Brew()
+    {
 		cout << "冲泡茶叶!" << endl;
 	}
 	//倒入杯中
-	virtual void PourInCup() {
+	virtual void PourInCup()
+    {
 		cout << "将茶水倒入杯中!" << endl;
 	}
 	//加入辅料
-	virtual void PutSomething() {
+	virtual void PutSomething()
+    {
 		cout << "加入枸杞!" << endl;
 	}
 };
 
 //业务函数
-void DoWork(AbstractDrinking* drink) {
+void DoWork(AbstractDrinking* drink)
+{
 	drink->MakeDrink();
 	delete drink;
 }
 
-void test01() {
+void test01()
+{
 	DoWork(new Coffee);
 	cout << "--------------" << endl;
 	DoWork(new Tea);
@@ -9179,8 +9384,8 @@ void test01()
 
 }
 
-int main() {
-
+int main()
+{
 	test01();
 
 	system("pause");
@@ -9260,8 +9465,8 @@ void test01()
 	ofs.close();
 }
 
-int main() {
-
+int main()
+{
 	test01();
 
 	system("pause");
@@ -9319,8 +9524,8 @@ void test01()
 	cout << "姓名： " << p.m_Name << " 年龄： " << p.m_Age << endl;
 }
 
-int main() {
-
+int main()
+{
 	test01();
 
 	system("pause");
