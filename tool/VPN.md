@@ -49,7 +49,7 @@ Clash 是一个**代理管理工具**，用于科学上网、流量分流和网�
 
 2. [一元机场](https://xn--1-q07a56pdss.com/#/login)：价格近乎免费，信号非常差
 
-3. [Toadlink](https://new.toadlink.icu/index.php#/dashboard)：挺好用的，但已经跑路了
+3. [PaoluLink](https://new.toadlink.icu/#/dashboard)：挺好用的，但已经停止注册了
 
 4. [FASTLINK](https://fastlink.ws/auth/login)：需要反复的真人识别，原因未知
 

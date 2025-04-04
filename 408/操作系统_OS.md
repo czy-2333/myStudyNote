@@ -1315,7 +1315,7 @@ void (*signal(int signum, void (*handler)(int)))(int);
 ```
 *   **作用**：为特定信号 `signum` 设置处理程序 `handler`
 
-    			当进程接收到这个信号时，会调用指定的处理函数
+    当进程接收到这个信号时，会调用指定的处理函数
 
 *   **参数**：
     *   `signum`：信号编号（例如 `SIGINT`、`SIGTERM` 等），表示要捕获的信号
