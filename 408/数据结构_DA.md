@@ -1138,11 +1138,11 @@ int main()
 
 
 
-## 1 查找
+## 1 查找与排序
 
 
 
-## 2 排序
+## 2 计算几何
 
 
 
@@ -1540,49 +1540,80 @@ int MKP(int C, vector<int>& v, vector<int>& w, vector<int>& m)
 
 
 
-## 4 其他算法
+## 4 基础数论
 
-### 4.1 基础数学
+### 4.1 素数
 
-#### 4.1.1质数筛
+#### 4.1.1 埃拉托色尼质数筛
 
-埃拉托色尼筛法（Sieve of Eratosthenes），它的时间复杂度为 $O(nlog⁡log⁡n)$，适用于大规模质数筛选（当 `n` 小于 10^7^ 时可用）
+埃拉托色尼筛法（Sieve of Eratosthenes）（又称埃氏筛法）是一种通过逐步筛除合数来筛选素数的经典算法
+
+它的时间复杂度为 $O(nlog⁡log⁡n)$，适用于大规模质数筛选（当 `n` 小于 10^7^ 时可用）
 
 
-
-该算法的核心思想是：
 
 1. 假设所有数都是质数，然后逐步筛去质数的倍数（非质数）
 2. 从 2 开始，如果某个数是质数，则它的所有倍数一定不是质数，直接标记为合数
 3. 继续寻找下一个未被标记的数，重复上述步骤，直到遍历到 $n$ 或者 $\sqrt{n}$
 4. 最终所有未被标记的数就是质数，可以用一个额外的数组来存储
 
-
-
 ```cpp
+vector<bool> is_prime;	// 判断一个数是不是质数
+vector<int> prime;
 void sieve(int n)
 {
-    vector<bool> is_prime(n + 1, true);	// 初始化所有数为质数
-    vector<int> prime;
-    is_prime[0] = is_prime[1] = false;	// 0 和 1 不是质数
+    is_prime.assign(n + 1, true);	// 初始化所有数为质数
+    prime.clear();
 
     for (int i = 2; i <= n; ++i)
     {
-        // 若当前数为质数
-        if (is_prime[i])
+        if (is_prime[i])	// 若当前数为质数
         {
             prime.push_back(i);
-            for (int j = i * i; j <= n; j += i)
-                is_prime[j] = false;
-            // 标记其所有倍数为非质数
-            // 小于 i 的倍数都已经被标记过了, 故从 i^2 开始筛查
+            for (int j = i * i; j <= n; j += i)		// 小于 i 的倍数都已经被标记过了, 故从 i^2 开始筛查
+                is_prime[j] = false;	// 标记其所有倍数为非质数
         }
     }
+}
+```
 
-    // 输出所有质数
-    for (int i : prime)
-        cout << i << " ";
-    cout << endl;
+
+
+#### 4.1.2 欧拉筛
+
+欧拉筛（又称线性筛法）其核心思想是**确保每个合数仅被其最小的质因数筛除一次**，从而将时间复杂度优化至线性级别 $O(n)$
+
+由于它避免了重复标记合数，因此在内存和计算效率上优于传统的埃拉托斯特尼筛法
+
+
+
+1. 创建一个标记数组，用于存放每个数的最小质因数，初始将所有数标记为素数（最小质因数标记为 0）
+2. 外层循环从 2 开始，逐个检查每个数 `i` 到目标范围 `n`，若 `i` 未被标记为非素数，将其加入 `primes` 数组
+3. 对当前数 `i`，用内层循环遍历 `primes` 数组中的每个素数 `p`，将 `i * p` 标记为非素数
+4. 若发现 `p` 是当前 `i` 的最小质因数，立即终止内层循环，确保每个合数只被其最小质因数筛除一次
+
+```cpp
+vector<int> minp;	// 存储一个数的最小质因数
+vector<int> prime;
+void sieve(int n)
+{
+    minp.assign(n + 1, 0);	// 初始化所有数的最小质因数
+    prime.clear();
+    for (int i = 2; i <= n; i++)
+    {
+        if (!minp[i])	// 最小质因数为0, 代表其没有小于自身的质因数, 其为质数
+            minp[i] = i, prime.push_back(i);
+
+        for (auto p : prime)
+        {
+            if (i * p > n) break;	// 超过界限
+            minp[i * p] = p;	// 用当前 i 与所有已知质数 p 相乘
+
+            if (p == minp[i]) break;
+            // 说明 p 已是 i 的最小质因数, i 的倍数中不会有超过 p 的最小质因数
+            // 若继续用更大的质数 p 标记 i×p, 会导致这些合数的最小质因数被错误覆盖, 从而破坏唯一性
+        }
+    }
 }
 ```
 
@@ -1592,7 +1623,7 @@ void sieve(int n)
 
 
 
-#### 4.1.2 辗转相除
+#### 4.1.3 辗转相除
 
 辗转相除一般用来寻找两个数的最大公因数，但可以使用内置的 `gcd` 函数代替
 
@@ -1631,6 +1662,28 @@ int myGcd(int a, int b)
 
 
 
+字符串处理：
+
+```cpp
+auto shift = [](vector<int>& c, string str)
+{
+	int i = 0;
+	while (i < str.length() && str[i] == '0') ++i;
+	if (i == str.length())
+		c.push_back(0);
+	else for (int j = str.length() - 1; j >= i; --j)
+		c.push_back(str[j] - '0');
+};
+```
+
+
+
+
+
+
+
+
+
 #### 4.2.1 加
 
 将处理好的数组（将字符串==逆序==转换为 `int` 数组并去除前导 0）进行以下步骤：
@@ -1641,8 +1694,6 @@ int myGcd(int a, int b)
 
 3. 处理进位： 当前位取模 10 得到该位结果，整除 10 得到新进位
 4. 最高位进位： 若最后进位不为零，添加到结果末尾
-
-
 
 ```cpp
 vector<int> add(vector<int>& A, vector<int>& B)
@@ -1679,10 +1730,8 @@ vector<int> add(vector<int>& A, vector<int>& B)
 3. 处理进位：立即将 `C[i+j]` 的进位部分传递到 `C[i+j+1]`，确保每位存单个数字
 4. 去除前导零：删除结果高位的多余零，保留至少一位
 
-
-
 ```cpp
-vector <int> mul(vector <int>& A, vector <int>& B)
+vector<int> mul(vector <int>& A, vector <int>& B)
 {
 	vector <int> C(A.size() + B.size(), 0);
 	for (int i = 0; i < A.size(); i++)
@@ -1719,7 +1768,7 @@ vector <int> mul(vector <int>& A, vector <int>& B)
 4. 去除前导零：结果可能有多余的前导零（逆序存储时位于数组末尾），需删除
 
 ```cpp
-vector <int> sub(vector<int> &A,vector<int> &B)
+vector<int> sub(vector<int> &A,vector<int> &B)
 {
     vector <int> C;
     int t = 0;
@@ -1745,3 +1794,220 @@ vector <int> sub(vector<int> &A,vector<int> &B)
 #### 4.2.4 除
 
 阿巴阿巴...
+
+
+
+
+
+
+
+### 4.3 逆元
+
+逆元是数论中的重要概念，通俗来说可以理解为==模运算中的倒数==
+
+在取模运算中，加减乘都能直接取模，但除法无法直接取模（如 `(a / b) % p` 不能直接计算），这时需要用逆元将除法转化为乘法
+
+其作用类似于倒数，通过将除法转化为乘法（如 `(a / b) % p = (a * x) % p`）来避免精度问题，其中 ==*x* 是 *b* 在模 *p* 意义下的逆元==
+
+可以用该式来表示 `a * x ≡ 1 (mod p)` *a* 在模 *p* 意义下的逆元 *x*
+
+注意：
+
+只有当 *a* 和模数 *p* 互质（即最大公约数为1）时，*a* 在模 *p* 下才有逆元
+
+若 `p = 6`（非质数），`a = 2`，因为 2 和 6 不互质，所以 2 在模 6 下没有逆元
+
+
+
+
+
+
+
+#### 4.3.1 扩展欧几里得
+
+**扩展欧几里得算法** 是欧几里得算法（辗转相除）的一个扩展版本
+
+不仅用于求两个整数的最大公约数（gcd），还可以求出一组整数系数 *x* 和 *y*，使得它们满足 **贝祖等式**
+
+
+
+贝祖定理：
+
+对于任意两个 **非零整数** *a* 和 *b*，存在整数 *x* 和 *y*，使得 `a * x + b * y = gcd(a, b)` （贝祖等式）成立
+
+其中，*x* 和 *y* 称为**贝祖系数**
+
+
+
+求逆元：
+
+当 *a* 和模数 *p* 互质时（即 `d = 1`），方程变为 `a * x + p * y = 1`
+
+此时，模 *p* 后方程简化为 `a * x ≡ 1 (mod p)`，因此 *x* 的值即为 *a* 在模 *p* 下的逆元
+
+
+
+方程推导：
+$$
+\large a \cdot x + b \cdot y = \gcd(a, b)
+$$
+
+$$
+\large b \cdot x' + (a \% b) \cdot y' = \gcd(a, b)
+$$
+
+$$
+\large a \% b = a - \left\lfloor \frac{a}{b} \right\rfloor \cdot b
+$$
+
+$$
+\LARGE\downarrow
+$$
+
+$$
+\large a \cdot \underbrace{y'}_{x} + b \cdot \underbrace{\bigg(x' - \left\lfloor \frac{a}{b} \right\rfloor \cdot y'\bigg)}_{y} = \gcd(a, b)
+$$
+
+$$
+\large x = y' \quad　y = x' - \left\lfloor \frac{a}{b} \right\rfloor \cdot y'
+$$
+
+
+
+
+
+
+
+通过递归求该解方程，当递归到 `p = 0` 时，返回 `x = 1`（此时 `gcd(a, 0) = a`），然后逐步回推调整 *x* 和 *y* 的值（贝祖定理）
+
+```cpp
+#define ll long long
+ll exgcd(ll a, ll b, ll &x, ll &y)
+{
+    if (!b) { x = 1, y = 0; return a; }
+    ll d = exgcd(b, a % b, x, y), t = x;
+    x = y;
+    y = t - a / b * y;
+    return d;
+}
+
+ll inv(ll a, ll p)
+{
+    ll x, y;
+    exgcd(a, p, x, y);
+    return (x % p + p) % p; // 保证结果为正数
+}
+```
+
+
+
+
+
+
+
+#### 4.3.2 快速幂
+
+快速幂，又称二进制取幂法，是一种高效计算大数幂运算的算法，尤其适用于模幂运算（如 a^b^ % p）
+
+将**指数分解为二进制形式**，通过平方和乘法逐步减少计算次数，将时间复杂度从传统方法的 `O(n)` 优化至 `O(log⁡n)`
+
+
+
+
+遍历指数的二进制位（从最低位到最高位）：
+
+* 若当前位为 `1`，将当前底数乘入结果
+
+- 平方更新底数
+- 右移指数，处理下一位
+
+```cpp
+#define ll long long
+#define mod 1000000007
+ll qpow(ll m, ll n)
+{
+	ll ans = 1;
+	while (n > 0)
+	{
+		if (n & 1)
+			ans = ans * m % mod;	// 底数乘入结果
+		m = m * m % mod;		// 平方底数
+		n = n >> 1;	// 右移指数
+	}
+	return ans % mod;
+}
+```
+
+注意：`mod` 的作用是防止超过 `int` 上限给出的题目条件
+
+
+
+
+
+
+
+#### 4.3.3 费马小定理
+
+若模数 *p* 是质数，且整数 *a* 满足 *a* 互质 *p*，则：
+
+$\large{a^{p-1} ≡ 1{\small\%}p}$
+
+将此式变形可得：
+
+$\large{a ⋅ a^{p-2} ≡ 1{\small\%}p}$
+
+即为 *a* 在模 *p* 下的逆元 *a^−1^*
+
+
+
+使用条件：
+
+- *p* 必须是质数
+- *a* 与 *p* 必须互质，即 `gcd(a, p) = 1`
+
+```cpp
+#define ll long long
+ll qpow(ll a, ll b, ll p)
+{
+    ll res = 1;
+    while (b)
+    {
+        if (b & 1)
+            res = res * a % p;
+        a = a * a % p;
+        b >>= 1;
+    }
+    return res;
+}
+
+ll inv(ll a, ll p)
+{
+    return qpow(a, p-2, p);
+}
+```
+
+
+
+
+
+
+
+#### 4.3.4 线性递推法
+
+用于批量求逆元，其核心思想是利用已知的逆元结果推导后续逆元
+
+递推公式：
+$$
+\large{inv[i]=(p−⌊\frac{p}{i}⌋)⋅inv[p{\small\%}i]{\small\%}p}
+$$
+
+```cpp
+void linear_inv(int n, int p)
+{
+    vector<int> inv(n + 1);
+    inv[1] = 1;
+    for (int i = 2; i <= n; i++) {
+        inv[i] = (ll)(p - p/i) * inv[p%i] % p;
+    }
+}
+```

@@ -9,7 +9,7 @@
 课件来源：
 
 * [黑马程序员官网](https://www.itheima.com/)
-* [赵虚左 ROS机器人](http://www.autolabor.com.cn/book/ROSTutorials/)
+* [赵虚左ROS机器人](http://www.autolabor.com.cn/book/ROSTutorials/)
 * [CS自学指南](https://csdiy.wiki/)
 * [代码随想录](https://www.programmercarl.com/)
 * [力扣平台](https://leetcode.cn/leetbook/)
