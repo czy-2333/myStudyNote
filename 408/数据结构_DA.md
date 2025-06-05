@@ -859,40 +859,6 @@ struct Edge
     int w;
 };
 
-// 朴素 Dijkstra 实现(不使用堆优化)
-// graph 邻接表, 其中 graph[i] 存储从节点 i 出发的所有边
-vector<int> dijkstra(int n, vector<vector<Edge>>& graph, int start)
-{
-    vector<int> dist(n, INT_MAX);  		// 记录最短路径
-    vector<bool> visited(n, false);  	// 记录节点是否已访问
-
-    dist[start] = 0;	// 初始化起点的 dist
-
-    for (int i = 0; i < n; i++)		// 遍历所有结点
-    {
-        int u = -1, minDist = INT_MAX;
-        for (int j = 0; j < n; j++)		// 找到未访问且 dist 最小的结点
-        {
-            if (!visited[j] && dist[j] < minDist)
-            {
-                minDist = dist[j];
-                u = j;
-            }
-        }
-
-        if (u == -1) break;		// 已经访问了所有能访问的结点, 剩下的结点可能未连通
-        visited[u] = true;  	// 标记 u 为已访问
-
-        for (auto& edge : graph[u])		// 更新dist
-        {
-            int v = edge.v, w = edge.weight;
-            if (!visited[v] && dist[u] + w < dist[v])
-                dist[v] = dist[u] + w;
-        }
-    }
-    return dist;
-}
-
 // 堆优化 Dijkstra 实现
 vector<int> dijkstra(int n, vector<vector<Edge>>& graph, int start)
 {
@@ -1138,7 +1104,67 @@ int main()
 
 
 
-## 1 查找与排序
+## 1 查找排序
+
+### 1.1 查找
+
+#### 1.1.1 二分查找
+
+二分查找 是一种在 **有序数组** 或 **有序区间** 中查找某个目标值的高效算法，时间复杂度为 **O(log n)**
+
+不断将查找区间**对半分割**，每次比较中间元素和目标值的关系，**缩小查找范围**
+
+
+
+**例：**
+
+```cpp
+int lower_bound(vector<int>& nums, int tag)
+{
+    int l = 0, r = nums.size() - 1;
+    while (l < r) {
+        int mid = (l + r) >> 1;
+        if (nums[mid] >= tag)
+            r = mid;
+        else
+            l = mid + 1;
+    }
+    return l;
+}
+```
+
+
+
+注意：
+
+* 循环条件
+
+    * `l <= r` 用于左闭右闭区间 `[l, r]`，能确保每次取到中点都在区间内
+    * `l < r` 用于左闭右开 `[l, r)` 或其他变种，不需要遍历到最后一个元素
+
+* 计算中值
+
+    * `mid = (l + r) >> 1` 用于向下取整，用于寻找 **最左边的解**
+    * `mid = (l + r + 1) >> 1` 用于向上取整，用于寻找 **最右边的解** 避免死循环
+
+* 边界更新
+
+    * 寻找左边界 `r = mid;` 和 `l = mid + 1; `
+    * 寻找右边界 `l = mid;` 和 `r = mid - 1;`
+
+* 避免死循环
+
+    每次循环都要让区间 **真正缩小**
+
+    如果 `l = mid`，那 `mid` 必须严格大于 `l`，否则 `l` 不变，会死循环
+
+    如果 `r = mid`，那 `mid` 必须严格小于 `r`，否则 `r` 不变，也会死循环
+
+
+
+
+
+
 
 
 
@@ -1544,7 +1570,7 @@ int MKP(int C, vector<int>& v, vector<int>& w, vector<int>& m)
 
 ### 4.1 素数
 
-#### 4.1.1 埃拉托色尼质数筛
+#### 4.1.1 埃式质数筛
 
 埃拉托色尼筛法（Sieve of Eratosthenes）（又称埃氏筛法）是一种通过逐步筛除合数来筛选素数的经典算法
 
@@ -1576,6 +1602,10 @@ void sieve(int n)
     }
 }
 ```
+
+
+
+
 
 
 
@@ -1631,8 +1661,6 @@ void sieve(int n)
 
 如果 `a < b`，则会有 `a = a % b`，因此无影响
 
-
-
 ```cpp
 int myGcd(int a, int b)
 {
@@ -1645,6 +1673,124 @@ int myGcd(int a, int b)
     return a;
 }
 ```
+
+
+
+
+
+
+
+#### 4.1.4 欧拉函数
+
+欧拉函数，通常指 *φ* 函数，记作 $\varphi(n)$，它的定义是：
+
+对于一个正整数 *n*，$\varphi(n)$ 表示小于等于 *n* 的正整数中，与 *n* 互质的数的个数
+
+
+
+公式：
+
+对 *n* 的质因数分解
+$$
+\large n = p_1^{k_1} p_2^{k_2} \cdots p_m^{k_m}
+$$
+
+$$
+\large\varphi(n) = n \left(1 - \frac{1}{p_1}\right)\left(1 - \frac{1}{p_2}\right)\cdots\left(1 - \frac{1}{p_m}\right)
+$$
+
+```cpp
+vector<int> prime;
+int euler(int x)
+{
+    int ans = x;
+    for (int p : prime)
+    {
+        if (p * p > x) break;
+        if (x % p) continue;
+        ans = ans / p * (p - 1);
+        while (x % p == 0) x /= p;
+    }
+    if (x > 1) ans = ans / x * (x - 1);
+    return ans;
+}
+
+// 在没有 prime 数组的情况下判断
+int euler(int n)
+{
+    int phi = 1;
+    for (int i = 2; i * i <= n; i++)
+    {
+        if (n % i == 0)
+        {
+            phi *= i - 1, n /= i;
+            while (n % i == 0) phi *= i, n /= i;
+        }
+    }
+    if (n > 1) phi *= n - 1;
+    return phi;
+}
+```
+
+注意：若 *i* 是质数则 $\varphi(i) = i - 1$ 
+
+
+
+
+
+
+
+#### 4.1.5 欧拉拓展
+
+1. 计算小于 *m* 的 **互质有序对** 的数量 *n*
+
+$$
+\large n = \sum_{i=1}^m \sum_{j=1}^m [\text{gcd}(i, j) = 1]
+$$
+
+对于固定的 *i*，满足 $\text{gcd}(i, j) = 1$ 的 *j* 的个数由欧拉函数 $\phi(i)$ 给出
+
+因此，对于每个 $i$，有 $\phi(i)$ 个 *j* 使得 $\text{gcd}(i, j) = 1$
+
+由于互质对是对称的（即 $(i, j)$ 和 $(j, i)$ 是等价的），所以需要乘以 *2*
+$$
+\large 2 \sum_{i=1}^m \phi(i)
+$$
+在上述计算中，将对角线上的点 $(i, i)$ 计数了两次，但只有 $(1, 1)$ 满足 $\text{gcd}(1, 1) = 1$，故减去 *1*
+$$
+\large n = 2 \sum_{i=1}^m \phi(i) - 1
+$$
+
+
+2. 当 *a* 与 *n* 互质时有：
+    $$
+    \large a^{\varphi(n)} \equiv 1 \pmod{n}
+    $$
+
+
+
+
+3. 如果 $\gcd(a, b) = 1$，则有：
+    $$
+    \large\varphi(ab) = \varphi(a) \cdot \varphi(b)
+    $$
+    
+
+
+
+4.当 $a, m \in \mathbb{Z}$ 时有：
+$$
+\Large a^b \equiv
+\begin{cases}
+a^b, & b < \varphi(m) \\\\
+a^{b \bmod \varphi(m)}, & \gcd(a, m) = 1 \\\\
+a^{b \bmod \varphi(m) + \varphi(m)}, & b \geq \varphi(m) 
+\end{cases}
+\pmod{m}
+$$
+
+
+
 
 
 
@@ -1665,7 +1811,7 @@ int myGcd(int a, int b)
 字符串处理：
 
 ```cpp
-auto shift = [](vector<int>& c, string str)
+auto shift = [](vector<int>& c, string& str)
 {
 	int i = 0;
 	while (i < str.length() && str[i] == '0') ++i;
@@ -1922,17 +2068,16 @@ ll inv(ll a, ll p)
 - 右移指数，处理下一位
 
 ```cpp
-#define ll long long
 #define mod 1000000007
-ll qpow(ll m, ll n)
+int qpow(int m, int n)
 {
-	ll ans = 1;
+	int ans = 1;
 	while (n > 0)
 	{
 		if (n & 1)
-			ans = ans * m % mod;	// 底数乘入结果
-		m = m * m % mod;		// 平方底数
-		n = n >> 1;	// 右移指数
+			ans = ans * m % mod;
+		m = m * m % mod;
+		n = n >> 1;
 	}
 	return ans % mod;
 }
@@ -1950,15 +2095,15 @@ ll qpow(ll m, ll n)
 
 若模数 *p* 是质数，且整数 *a* 满足 *a* 互质 *p*，则：
 
-$\large{a^{p-1} ≡ 1{\small\%}p}$
+$\large a^{p-1} ≡ 1 \pmod{m}$
 
 将此式变形可得：
 
-$\large{a ⋅ a^{p-2} ≡ 1{\small\%}p}$
+$\large a ⋅ a^{p-2} ≡ 1\pmod{m}$
 
 即为 *a* 在模 *p* 下的逆元 *a^−1^*
 
-
+C^3^~5~ 能不能化简为A^5^~5~ /A^3^~3~ 
 
 使用条件：
 
@@ -1966,10 +2111,9 @@ $\large{a ⋅ a^{p-2} ≡ 1{\small\%}p}$
 - *a* 与 *p* 必须互质，即 `gcd(a, p) = 1`
 
 ```cpp
-#define ll long long
-ll qpow(ll a, ll b, ll p)
+int qpow(int a, int b, int p)
 {
-    ll res = 1;
+    int res = 1;
     while (b)
     {
         if (b & 1)
@@ -1980,7 +2124,7 @@ ll qpow(ll a, ll b, ll p)
     return res;
 }
 
-ll inv(ll a, ll p)
+int inv(int a, int p)
 {
     return qpow(a, p-2, p);
 }
@@ -2007,7 +2151,259 @@ void linear_inv(int n, int p)
     vector<int> inv(n + 1);
     inv[1] = 1;
     for (int i = 2; i <= n; i++) {
-        inv[i] = (ll)(p - p/i) * inv[p%i] % p;
+        inv[i] = (p - p / i) * inv[p % i] % p;
     }
 }
 ```
+
+
+
+
+
+
+
+#### 4.3.5 中国剩余定理
+
+**中国剩余定理**（CRT）是一个关于整数同余方程组的定理，它说明了在模数互质的情况下，一个同余方程组有唯一解（模乘积意义下）
+
+
+
+设有一组模数两两互质的正整数 $m_1, m_2, \ldots, m_k$，即：$\gcd(m_i, m_j) = 1 \quad \text{且 } i \ne j$
+
+给定一组整数余数 $a_1, a_2, \ldots, a_k$，则同余方程组：
+$$
+\large\begin{cases} x \equiv a_1 \pmod{m_1} \\ x \equiv a_2 \pmod{m_2} \\ \quad \vdots \\ x \equiv a_k \pmod{m_k} \end{cases}
+$$
+
+
+在模 $M = m_1 \cdot m_2 \cdots m_k$ 意义下有唯一解，即存在唯一的 $x \in [0, M)$，满足上述所有同余式
+
+
+
+解法步骤：
+
+1. 计算总模 $\large M = m_1 \cdot m_2 \cdots m_k$
+
+2. 对每一个 *i*，计算：
+
+    - $\large M_i = \frac{M}{m_i}$
+    - $\large y_i \equiv M_i^{-1} \pmod{m_i}$，即求 $M_i$ 在模 $m_i$ 下的逆元
+
+3. 最终解为：
+
+    $\large x \equiv \sum_{i=1}^{k} a_i \cdot M_i \cdot y_i \pmod{M}$
+
+
+
+举例说明：
+
+求解：
+$$
+\large\begin{cases} x \equiv 2 \pmod{3} \\ x \equiv 3 \pmod{5} \\ x \equiv 2 \pmod{7} \end{cases}
+$$
+
+
+- $M = 3 \cdot 5 \cdot 7 = 105$
+- $M_1 = 105 / 3 = 35$，$M_2 = 105 / 21$，$M_3 = 105 / 15$
+- 计算模逆元：
+    - $y_1 = 35^{-1} \mod 3 = 2$（因为 $35 \cdot 2 = 70 \equiv 1 \mod 3$）
+    - $y_2 = 21^{-1} \mod 5 = 1$
+    - $y_3 = 15^{-1} \mod 7 = 1$
+- 得：
+
+$$
+x \equiv 2 \cdot 35 \cdot 2 + 3 \cdot 21 \cdot 1 + 2 \cdot 15 \cdot 1 = 140 + 63 + 30 = 233
+$$
+
+
+
+- 所以最终结果是：
+
+$$
+x \equiv 233 \mod 105 \Rightarrow x \equiv 23 \mod 105
+$$
+
+```cpp
+#define ll long long
+vector<ll> W, B;
+ll CRT()
+{
+    ll n = 1;
+    for (int i = 0; i < W.size(); i++) n *= W[i];
+
+    ll ans = 0;
+    for (int i = 0; i < W.size(); i++)
+    {
+        ll t = n / W[i];
+        ans = (ans + inv(W[i], t) * t * B[i]) % n;
+    }
+    return ans > 0 ? ans : ans + n;
+}
+```
+
+
+
+
+
+
+
+### 4.4 组合数学
+
+#### 4.4.1 容斥定理
+
+容斥定理是组合数学中的一个基本原理，用于计算多个集合并集的元素个数，尤其适用于存在交集的情况
+
+当我们想求多个集合的**并集**大小时，不能简单地把每个集合的大小直接相加，因为其中的**重叠部分**会被重复计算
+
+
+
+有 **A**、**B** 两个集合：
+$$
+|A \cup B| = |A| + |B| - |A \cap B|
+$$
+有 **A**、**B**、**C** 三个集合：
+$$
+|A \cup B \cup C| = |A| + |B| + |C| - |A \cap B| - |A \cap C| - |B \cap C| + |A \cap B \cap C|
+$$
+有 $A_1, A_2, \dots, A_n$ 共 *n* 个集合：
+$$
+∣\left|\bigcup_{i=1}^n A_i\right| = \sum_{i} |A_i| - \sum_{i<j} |A_i \cap A_j| + \sum_{i<j<k} |A_i \cap A_j \cap A_k| - \cdots + (-1)^{n+1} |A_1 \cap A_2 \cap \cdots \cap A_n|
+$$
+
+
+可以理解为：**n 个球，m 个盒子**，每个球必须放到一个盒子里，而且盒子是编号的（比如 1 号、2 号、……、m 号盒子）
+
+想知道有多少种方法，把这些球放进盒子里，使得每个盒子至少有一个球 （**不能有空盒子**）
+
+
+
+每个球有 *m* 种选择（可以放到任意一个盒子里），所以总共有 $m^n$ 种方法
+
+但是我们只想要那些**没有空盒子**的方案，所以我们要 **减去** 那些不满足条件的放法（也就是有盒子是空的）
+
+我们可以先把所有放法都算上，然后再减掉那些有一个盒子是空的，再加上那些有两个盒子空的……反复加减
+$$
+\large\sum_{i=0}^{m} (-1)^{i}\text{ }C{^i_m}\text{ }(m-i)^n
+$$
+
+
+==为什么要反复加减？==
+
+有些分法不只让 **一个盒子空**，可能让 **两个盒子都空**了，该情况被计算了两遍
+
+当 **A**、**B** 两个盒子都是空的，只用了盒子 **C**，将 **空A** 和 **空B** 的情况分别算过一次，所以这类情况被**减了两次**，但实际上应该**只减一次**
+
+所以减掉所有 **空一个盒子** 的情况，再加回来那些 **空两个盒子** 的情况，避免减重
+
+如果还有 **空三个盒子** 的情况，那又被重复加了，所以再减回去……
+
+```c++
+// 计算组合数 C(m, k)
+int comb(int m, int k)
+{
+    int res = 1;
+    for (int i = 1; i <= k; ++i)
+    {
+        res *= (m - i + 1);
+        res /= i;
+    }
+    return res;
+}
+
+// 将 n 个球放入 m 个盒子，每个盒子至少一个球
+int in_ex(int m, int n)
+{
+    int total = 0;
+
+    for (int i = 0; i < m; ++i)
+    {
+        if (i & 1) total -= comb(m, i) * pow(m - i, n);
+        else total += comb(m, i) * pow(m - i, n);
+    }
+
+    return total;
+}
+```
+
+
+
+
+
+
+
+#### 4.4.2 错排递推
+
+错排递推公式，用于计算 *n* 个元素的完全错位排列数，即所有元素都不在其原始位置上的排列方式数
+
+其公式为：
+$$
+\large D{_n} = (n−1)(D{_{n-1}} + D{_{n-2}})
+$$
+
+
+推导：
+
+1. 放置第 *n* 个元素
+    第 *n* 个元素不能放在原位，因此有 $n − 1$​​ 种选择（例如放入位置 *k*，其中 $1 ≤ k ≤ n−1$）
+
+2. 放置第 *k* 个元素
+    * 情况 1：第 *k* 个元素放入位置 *n* 
+        此时剩余 $n − 2$ 个元素（排除第 *n* 和第 *k* 个元素）需要全错位排列，对应方式数为$D{_{n-2}}$
+    * 情况 2：第 *k* 个元素不放入位置 *n* 
+        此时剩余 $n − 1$ 个元素（排除第 *n* 个元素）需要全错位排列，对应方式数为$D{_{n-1}}$
+
+
+
+```cpp
+int misplace(int n)
+{
+    vector<int> dp(n + 1);
+    dp[2] = 1;
+    for (int i = 3; i <= n; i++)
+        dp[i] = (i - 1) * (dp[i - 1] + dp[i - 2]);
+    return dp[n];
+}
+```
+
+
+
+
+
+
+
+
+
+#### 4.4.3 卡特兰数
+
+卡特兰数（Catalan numbers）是组合数学中一类重要的数列，满足特定递推关系，前几项为：1, 1, 2, 5, 14, 42, 132, 429, ...
+
+其递推关系有两种形式：
+
+- 经典递推式：
+
+  $$
+  h(n) = h(0)h(n-1) + h(1)h(n-2) + \cdots + h(n-1)h(0) \quad (n \ge 2)
+  $$
+
+- 优化递推式：
+
+  $$
+  h(n) = \frac{4n - 2}{n + 1} h(n - 1) \quad (h(0) = 1)
+  $$
+
+
+
+可以用于处理 **括号匹配问题**，**出栈序列问题**，**二叉树计数** 等问题
+
+```cpp
+int catalan(int n)
+{
+    int ans = 1;
+    for (int i = 2; i <= n; ++i)
+        ans = (4 * i - 2) * ans / (i + 1);
+    return ans;
+}
+```
+
+
+

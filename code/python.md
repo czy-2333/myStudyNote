@@ -1,6 +1,6 @@
 # python 基础入门
 
-## 1 基础概要
+## 1 概要
 
 ### 1.1 数据和转换关系
 
@@ -381,6 +381,8 @@ float1 // float2 2.0
 
 
 
+
+
 ## 2 I/O
 
 ### 2.1 输出
@@ -600,7 +602,7 @@ hello world
 
 #### 3.1.1 字符串赋值
 
-Python 支持三种字符串定义方式：
+python 支持三种字符串定义方式：
 
 1. **单引号定义**：`name = '黑马程序员'`
 2. **双引号定义**：`name = "黑马程序员"`
@@ -1266,7 +1268,63 @@ if 2 < x < 10:
 
 
 
+#### 4.1.5 三位运算符
 
+在 python 中，**三元运算符** 是一种简洁的条件表达式，用于在单行内实现简单的 `if-else` 逻辑
+
+
+
+```py
+<表达式1> if <条件> else <表达式2>
+```
+
+若 `<条件>` 为真（True），返回 `<表达式1>` 的值
+
+若 `<条件>` 为假（False），返回 `<表达式2>` 的值
+
+
+
+例：
+
+```py
+# 比较两个数的大小
+a, b = 10, 20
+max_value = a if a > b else b  # 等价于 if a > b: max_value = a; else: max_value = b
+print(max_value)  # 20
+
+# 检查数字奇偶性
+num = 15
+result = "偶数" if num % 2 == 0 else "奇数"
+print(result)  # "奇数"
+
+# 嵌套三元表达式（可读性较低，慎用）
+score = 85
+grade = 'A' if score >= 90 else 'B' if score >= 80 else 'C'
+print(grade)  # 'B'
+```
+
+
+
+注意：
+
+1. 与 if-else 语句的区别：
+
+三元运算符是表达式（有返回值），而 `if-else` 是语句（无返回值）
+因此三元运算符可嵌入到其他表达式中（如赋值、函数参数、列表推导等）
+
+```py
+# 嵌入函数参数
+print("通过" if score >= 60 else "未通过")
+
+# 在列表推导式中使用
+numbers = [1, 2, 3, 4]
+squared = [x**2 if x % 2 == 0 else x for x in numbers]
+print(squared)  # [1, 4, 3, 16]
+```
+
+2. 避免嵌套过深：
+
+嵌套三元表达式（如 `x if a else y if b else z`）会降低可读性，建议改用完整的 `if-elif-else` 语句
 
 
 
@@ -1758,6 +1816,8 @@ sorted([1, 3, 2])	# 容器排序 [1, 2, 3]
 | 重复元素 | 支持     | 支持       | 支持       | ==不支持== | ==不支持==                               |
 | 可修改性 | 支持     | ==不支持== | ==不支持== | 支持       | 支持                                     |
 
+注意：所有支持下标索引的容器都可以使用切片
+
 
 
 
@@ -1842,18 +1902,16 @@ str1 <class 'str'>
 
 常用方法：（方法即为成员函数）
 
-| **使用方式**            | **作用**                                       |
-| ----------------------- | ---------------------------------------------- |
-| 列表.append(元素)       | 向列表中追加一个元素                           |
-| 列表.extend(容器)       | 将数据容器的内容依次取出，追加到列表尾部       |
-| 列表.insert(下标, 元素) | 在指定下标处，插入指定的元素                   |
-| del 列表[下标]          | 删除列表指定下标元素                           |
-| 列表.pop(下标)          | 删除列表指定下标元素                           |
-| 列表.remove(元素)       | 从前向后，删除此元素第一个匹配项               |
-| 列表.clear()            | 清空列表                                       |
-| 列表.count(元素)        | 统计此元素在列表中出现的次数                   |
-| 列表.index(元素)        | 查找指定元素在列表的下标  找不到报错ValueError |
-| len(列表)               | 统计容器内有多少元素                           |
+| **使用方式**       | **作用**                                       |
+| ------------------ | ---------------------------------------------- |
+| append(元素)       | 向列表中追加一个元素                           |
+| extend(容器)       | 将数据容器的内容依次取出，追加到列表尾部       |
+| insert(下标, 元素) | 在指定下标处，插入指定的元素                   |
+| pop(下标)          | 删除列表指定下标元素                           |
+| remove(元素)       | 从前向后，删除此元素第一个匹配项               |
+| clear()            | 清空列表                                       |
+| count(元素)        | 统计此元素在列表中出现的次数                   |
+| index(元素)        | 查找指定元素在列表的下标  找不到报错ValueError |
 
 
 
@@ -1900,10 +1958,6 @@ print(count)    # 3
 # index() 查找指定元素的下标
 index = my_list.index(2)  # 查找左边第一个2的下标
 print(index)    # 2
-
-# len() 统计列表中元素的个数
-length = len(my_list)
-print(length)   # 6
 ```
 
 
@@ -1946,11 +2000,10 @@ print(length)   # 6
 
 常用方法：
 
-| **方法**  | **作用**                                           |
-| --------- | -------------------------------------------------- |
-| index()   | 查找某个数据，如果数据存在返回对应的下标，否则报错 |
-| count()   | 统计某个数据在当前元组出现的次数                   |
-| len(元组) | 统计元组内的元素个数                               |
+| **方法**    | **作用**                                           |
+| ----------- | -------------------------------------------------- |
+| index()     | 查找某个数据，如果数据存在返回对应的下标，否则报错 |
+| count(元素) | 统计某个数据在当前元组出现的次数                   |
 
 注意：元组由于不可修改的特性，所以其操作方法非常少
 
@@ -2078,16 +2131,15 @@ print(new_tuple)  # (5, 3)
 
 常用方法：
 
-| 方法                           | 说明                                                        |
-| ------------------------------ | ----------------------------------------------------------- |
-| 集合.add(元素)                 | 集合内添加一个元素                                          |
-| 集合.remove(元素)              | 移除集合内指定的元素                                        |
-| 集合.pop()                     | 从集合中随机取出一个元素                                    |
-| 集合.clear()                   | 将集合清空                                                  |
-| 集合1.difference(集合2)        | 得到一个新集合，内含2个集合的差集  原有的2个集合内容不变    |
-| 集合1.difference_update(集合2) | 在集合1中，删除集合2中存在的元素  集合1被修改，集合2不变    |
-| 集合1.union(集合2)             | 得到1个新集合，内含2个集合的全部元素  原有的2个集合内容不变 |
-| len(集合)                      | 得到一个整数，记录了集合的元素数量                          |
+| 方法                    | 说明                                                        |
+| ----------------------- | ----------------------------------------------------------- |
+| add(元素)               | 集合内添加一个元素                                          |
+| remove(元素)            | 移除集合内指定的元素                                        |
+| pop()                   | 从集合中随机取出一个元素                                    |
+| clear()                 | 将集合清空                                                  |
+| difference(集合)        | 得到一个新集合，内含2个集合的差集  原有的2个集合内容不变    |
+| difference_update(集合) | 在集合1中，删除集合2中存在的元素  集合1被修改，集合2不变    |
+| union(集合)             | 得到1个新集合，内含2个集合的全部元素  原有的2个集合内容不变 |
 
 
 
@@ -2124,9 +2176,6 @@ print(set1)  # {6}
 
 # union() 合并两个集合，得到新集合
 print(set1.union(set2))  # {3, 4, 5, 6}
-
-# len() 得到集合的元素数量
-print(len(set1))  # 1
 ```
 
 注意：集合不能使用 `[]` 获取元素
@@ -2162,9 +2211,14 @@ my_dict = {key: value, key: value, ..., key: value}
 # 定义空字典
 my_dict = {}
 my_dict = dict()
+
+my_dict['a'] = 1
+print(my_dict['a'])	# 1
+my_dict['a'] = 2
+print(my_dict['a'])	# 2
 ```
 
-注意：`dict` 不能通过下标来获得元素，但可以通过 `[]` 用 `Key` 来获得对应元素
+注意：`dict` 不能通过下标来获得元素，但可以通过 `[]` 用 `Key` 来获得对应元素和赋值，修改元素
 
 
 
@@ -2176,14 +2230,12 @@ my_dict = dict()
 
 常用方法：
 
-| 操作              | 说明                                          |
-| ----------------- | --------------------------------------------- |
-| 字典[Key]         | 获取指定Key对应的Value值                      |
-| 字典[Key] = Value | 添加或更新键值对                              |
-| 字典.pop(Key)     | 取出Key对应的Value并在字典内删除此Key的键值对 |
-| 字典.clear()      | 清空字典                                      |
-| 字典.keys()       | 获取字典的全部Key，可用于for循环遍历字典      |
-| len(字典)         | 计算字典内的元素数量                          |
+| 操作     | 说明                                          |
+| -------- | --------------------------------------------- |
+| get(Key) | 获取键对应的值，并可以设置默认值              |
+| pop(Key) | 取出Key对应的Value并在字典内删除此Key的键值对 |
+| clear()  | 清空字典                                      |
+| keys()   | 获取字典的全部Key，可用于for循环遍历字典      |
 
 
 
@@ -2194,14 +2246,10 @@ my_dict = dict()
 my_dict = {"a": 1, "b": 2, "c": 3}
 print(my_dict)  # {'a': 1, 'b': 2, 'c': 3}
 
-# 字典[Key] = Value 添加或更新键值对
-my_dict["d"] = 4  # 添加新键值对
-my_dict["b"] = 5  # 更新键值对
-print(my_dict)  # {'a': 1, 'b': 5, 'c': 3, 'd': 4}
-
 # 字典[Key] 获取指定Key对应的Value值
 print(my_dict["a"]) # 获取键"a"对应的值  1
-
+my_dict["d"] = my_dict.get("d", 0) + 1 # 根据键的当前值来进行赋值, 若没有该键则以默认值创建
+print(my_dict["d"])
 
 # pop(Key) 取出Key对应的Value并删除此键值对
 print(my_dict.pop("c")) # 删除键"c"对应的键值对，并获取值  3
@@ -2226,7 +2274,9 @@ print(len(my_dict)) # 计算字典元素个数  3
 
 
 
-### 6.6 通用方法
+### 6.6 其他
+
+#### 6.6.1 通用方法
 
 通用方法是指列表，元组，集合，字符串，字典都可以使用的方法
 
@@ -2289,11 +2339,86 @@ print(sorted(my_list, reverse=True))    # [9, 7, 5, 3, 1]
 
 
 
+#### 6.6.2 容器的乘法操作
+
+在 python 中，可以对部分容器使用乘法 `*` 操作，用于重复容器的元素内容，但行为取决于容器类型
+
+| 容器类型     | 说明                 |
+| ------------ | -------------------- |
+| 字符串 `str` | 重复拼接字符         |
+| 列表 `list`  | 重复元素形成新列表   |
+| 元组 `tuple` | 重复元素形成新元组   |
+| 集合 `set`   | ==不支持==           |
+| 字典 `dict`  | ==不支持==           |
+| 多维容器     | 需要注意引用共享问题 |
+
+
+
+**例：**
+
+```py
+# string
+s = 'abc' * 3
+print(s)  # 'abcabcabc'
+
+# list
+a = [1, 2] * 3
+print(a)  # [1, 2, 1, 2, 1, 2]
+
+# tuple
+t = (0, 1) * 4
+print(t)  # (0, 1, 0, 1, 0, 1, 0, 1)
+
+# 多维容器
+a = [[0] * 3] * 2
+a[0][0] = 1
+print(a)  # [[1, 0, 0], [1, 0, 0]]
+# 上面这种写法会导致两个子列表引用同一个对象, 修改一个,  另一个也变了
+```
 
 
 
 
-#  python 进阶
+
+
+
+#### 6.6.3 容器的推导式
+
+在 python 中，容器的推导式用于快速生成新的容器对象
+
+其本质上是一种语法糖，它在内部会被转换成等价的循环结构和条件判断
+
+将循环逻辑嵌入到一个表达式中，自动构建出一个新的容器对象
+
+
+
+**例：**
+
+```py
+[表达式 for 变量 in 可迭代对象 if 条件]		# 列表推导式
+{表达式 for 变量 in 可迭代对象 if 条件}		# 集合推导式
+{键表达式: 值表达式 for 变量 in 可迭代对象 if 条件}	# 字典推导式
+
+# 列表递推式
+print([x * x for x in range(5)])    # [0, 1, 4, 9, 16]
+print([x for x in range(10) if x % 2 == 0]) # [0, 2, 4, 6, 8]
+
+# 集合推导式(自动去重)
+print({x % 3 for x in range(10)})   # {0, 1, 2}
+
+# 字典推导式
+print({x: x**2 for x in range(5)})  # {0: 0, 1: 1, 2: 4, 3: 9, 4: 16}
+orig = {'a': 1, 'b': 2}
+print({v: k for k, v in orig.items()})  # {1: 'a', 2: 'b'}, 反转字典
+```
+
+
+
+
+
+
+
+#  python 进阶学习
 
 ## 1 文件操作
 
@@ -2467,7 +2592,7 @@ f.close()
 
 ## 2 异常
 
-当检测到一个错误时，python解释器就无法继续执行了，反而出现了一些错误的提示，这就是所谓的**异常**, 也就是我们常说的 `bug`
+当检测到一个错误时，python 解释器就无法继续执行了，反而出现了一些错误的提示，这就是所谓的**异常**, 也就是我们常说的 `bug`
 
 
 
@@ -4239,7 +4364,7 @@ fn = outer(sleep)
 fn()
 
 
-# 装饰器的快捷写法（语法糖）
+# 装饰器的快捷写法(语法糖)
 def outer(func):
     def inner():
         print("我睡觉了")
@@ -4621,8 +4746,6 @@ socket_client.close()
 
 ### 1.1 pymysql
 
-
-
 如果想用python来执行SQL从而操作数据库，需要使用第三方库 pymysql 来完成对MySQL数据库的操作
 
 安装 pymysql：
@@ -4722,7 +4845,7 @@ cursor.close()
 
 ## 2 Spark
 
-
+阿巴阿巴...
 
 
 
@@ -4742,15 +4865,15 @@ cursor.close()
 
 
 
+## 1 AI大模型
 
-
-## 1 代码调用API
+### 1.1 API调用
 
 本篇使用 CharGPT 来举例
 
 
 
-### 1.1 获取密钥
+#### 1.1.1 获取密钥
 
 获取 ChatGPT 的密钥可以在 openAI 的官网获得 [https://platform.openai.com/docs/overview](https://platform.openai.com/docs/overview)
 
@@ -4762,13 +4885,19 @@ cursor.close()
 
 
 
-记得复制你的 `API key` 为了安全起见，官网不会再次显示，请务必在当时复制
+记得复制你的 `API key` ！！！
+
+为了安全起见，官网不会再次显示，请务必在当时复制
 
 ![](assets/chatGPT3.png) 
 
 
 
-### 1.2 环境变量
+
+
+
+
+#### 1.1.2 环境变量
 
 在获取 `API key` 后，将其导入到系统变量中，方便之后读取
 
@@ -4780,7 +4909,7 @@ cursor.close()
 
 
 
-变量名填 `OPENAI_API_KEY`，变量值填 刚才复制的 `API key`
+变量名填 `OPENAI_API_KEY`，变量值填刚才复制的 `API key`
 
 ![](assets/系统变量.png) 
 
@@ -4790,18 +4919,292 @@ cursor.close()
 
 
 
-### 1.3 Python调用
+#### 1.1.3 客户端调用
 
-ChatGPT 的 API 需要美金购买（没有美国银行卡），且没有免费额度，调用直接报错🤡
-
-
+ChatGPT 的 API 需要美金购买（没有美国银行卡），且没有免费额度，直接调用会报错
 
 
 
+但可以用 [国内镜像网站](https://api.chatanywhere.tech/#/) 的 **API Key**
+
+价格和官网相比，较为便宜
+
+
+
+下载一个可以调用 **API Key** 的 人工智能交互软件的客户端 [Chatbox AI](https://chatboxai.app/zh?c=download-windows)
+
+填写 **API Key** 和 **API 主机网址** 后即可调用该 API
+
+
+
+![](assets/客户端填写apikey.png) 
 
 
 
 
-## 2 本地大模型
 
-阿巴阿巴...
+
+
+
+
+### 1.2 本地大模型
+
+#### 1.2.1 Ollama 下载
+
+[Ollama](https://ollama.com/) 是一个专注于本地人工智能模型部署和管理的平台，提供了对多种开源或定制 AI 模型的支持
+
+可以让用户能够在自己的设备上运行、管理和使用人工智能模型，而无需依赖云端服务
+
+
+
+在官网下载安装包后直接安装会默认安装在 C盘
+
+在终端中使用 `ollamasetup.exe /DIR=指定路径路径` 安装到指定位置
+
+若显示找不到 `ollamasetup.exe` 指令，将 `ollamasetup` 替换为安装包的地址
+
+
+
+之后，在官网根据自己的运存大小选择需要的大语言模型（当模型大小大于运存时会导致卡顿）
+
+出于学习目的的话，仅下载最小的模型即可，我们只需学会模型的调用和调试
+
+将指令在终端中输入下载指令
+
+![](assets/ollama模型下载.png) 
+
+但为了防止模型下载到 **C盘**，需要在系统变量中添加新的变量，后重启电脑
+
+变量名是 `OLLAMA_MODELS`，变量值是 `指定安装地址`
+
+
+
+
+
+
+
+#### 1.2.2 Ollama 使用
+
+下载模型后可以通过终端调用该大模型，输入 `ollama` 显示所有的可调用指令
+
+```sh
+Usage:
+  ollama [flags]
+  ollama [command]
+
+Available Commands:
+  serve       Start ollama
+  create      Create a model from a Modelfile
+  show        Show information for a model
+  run         Run a model
+  stop        Stop a running model
+  pull        Pull a model from a registry
+  push        Push a model to a registry
+  list        List models
+  ps          List running models
+  cp          Copy a model
+  rm          Remove a model
+  help        Help about any command
+
+Flags:
+  -h, --help      help for ollama
+  -v, --version   Show version information
+
+Use "ollama [command] --help" for more information about a command.
+```
+
+
+
+其中常用的有
+
+```sh
+ollama list	# 查看模型名字
+ollama run 模型名字	# 启动模型
+ollama rm 模型名字	# 卸载模型
+```
+
+退出模型按 `ctrl` + `d`
+
+
+
+演示：
+
+![](assets/ollama演示.png) 
+
+
+
+
+
+
+
+
+
+
+
+## 2 PyTorch
+
+PyTorch 是一个基于 python 的**开源深度学习框架**
+
+其以动态计算图、灵活的 API 和强大的 GPU 加速能力为核心优势，成为学术界和工业界广泛使用的工具
+
+主要用于 **计算机视觉**（CV），**自然语言处理**（NLP），**强化学习与科学计算**
+
+
+
+### 2.1 conda
+
+#### 2.1.1 conda 指令
+
+**conda** 是一个开源的 **包管理器** 和 **环境管理器**，适用于 Python、R、C 等多种语言的科学计算包
+
+注意：`conda` 和 [Anaconda](https://anaconda.org/) 虽然名称相似，但它们是不同层级的概念，`Anaconda` 是一整套工具箱，`conda` 是其中的一把多功能扳手
+
+
+
+你可以用 `conda` 来：
+
+1. 安装、升级、卸载软件包（类似于 pip，但功能更强）
+
+2. 自动解决依赖关系
+
+3. 支持安装二进制包（无需编译，适合科学计算类包）
+
+```bash
+conda install numpy			# 安装 numpy 包
+conda update pandas			# 将 pandas 包升级到最新版本
+conda remove matplotlib		# 卸载 matplotlib 包
+```
+
+
+
+且 `conda` 能够创建多个独立的 python 环境，每个环境有自己的一套包，互不干扰，适合管理多个项目
+
+```bash
+conda create -n myenv python=3.9	# 创建一个名为 myenv 的 conda 虚拟环境, 并指定使用 Python 3.9
+conda activate myenv	# 激活名为 myenv 的环境，使当前终端进入该环境
+conda deactivate		# 退出当前激活的环境，返回到 base（基础环境）
+conda env list			# 列出已有的环境
+conda remove -n myenv --all		# 删除名为 myenv 的整个环境, 需在 base 环境进行
+# 上述指令需要在 conda 自带的终端中使用
+```
+
+
+
+
+
+
+
+#### 2.1.2 conda 环境配置
+
+在创建 python 项目时可以通过 `conda` 配置 python 的环境
+
+
+
+其中 `conda` 的路径为 `conda` 的安装目录下的 `\Scripts\conch.exe`
+
+环境需要通过 `conda create` 创建
+
+
+
+以下为用 `conda` 来构建 `pycharm` python 项目的示意图 
+
+<img src="assets/conda配置pycharm环境.png" style="zoom:80%;" /> 
+
+
+
+若不能创建项目，点击其他解释器类型后再返回刷新界面
+
+
+
+
+
+
+
+### 2.2 安装PyTorch
+
+#### 2.2.1 CPU 环境和 GPU 环境
+
+PyTorch 分为 GPU 环境和 CPU 环境，其主要是为了**利用不同硬件的计算优势**，满足不同场景的性能需求
+
+1. CPU 环境：
+
+    可以用于简单的模型开发与调试，在没有 GPU 的机器上运行
+
+    训练大规模深度学习模型时速度较慢
+
+2. GPU 环境：
+
+    可以用于训练深度学习模型，尤其是大规模模型（如 ResNet、BERT），大规模数据集的特征提取和预处理
+
+    对于大型深度学习任务（如 CNN、Transformer 等），训练速度远快于 CPU
+
+    专为并行计算设计，拥有成千上万个小内核，需要安装支持 CUDA（NVIDIA 的并行计算平台）来加速
+
+| 场景                       | 推荐环境 | 原因                        |
+| :------------------------- | :------- | :-------------------------- |
+| 大型模型训练 (ResNet/BERT) | ==GPU==  | 并行计算加速迭代            |
+| 微服务 API 推理            | CPU      | 避免 GPU 资源争用，降低成本 |
+| 边缘设备部署 (树莓派)      | CPU      | 无 GPU 硬件支持             |
+| 数据预处理/特征工程        | CPU      | IO 密集型任务 GPU 无优势    |
+
+
+
+
+
+
+
+#### 2.2.2 安装指令
+
+可以通过 `pip` 或 `conda` 安装
+
+1. pip
+
+```sh
+# cpu 环境
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+
+# gpu 环境
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+# cu118 是 cuda 的 11.8 版本, 可使用其他版本
+
+# 提前下载 whl 文件
+pip install whl文件的地址
+# https://download.pytorch.org/whl/cu118/torch-2.0.1%2Bcu118-cp38-cp38-win_amd64.whl
+# 下载地址 可自行替换网址中的 cuda 版本和 py 版本
+```
+
+
+
+2. conda
+
+```sh
+# cpu 环境
+conda install pytorch torchvision torchaudio cpuonly -c pytorch
+
+# gpu 环境
+conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
+
+# 使用国内镜像源
+conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c 镜像网址
+# https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/pytorch/win-64/ 国内清华源
+```
+
+下载需要连接代理，如果下载速度过慢请使用国内镜像源
+
+
+
+
+
+
+
+#### 2.2.3 CUDA 版本选择
+
+CUDA 的版本需要根据GPU的算力来选择，不同算力对应版本如下
+
+![](assets/cuda版本选择.png) 
+
+
+
+GPU 的算力可以根据 GPU 型号得到（ctrl + shift + esc 打开任务管理器查看 GPU 型号）
+
+![](assets/gpu算力.png) 
